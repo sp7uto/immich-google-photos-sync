@@ -307,6 +307,8 @@ def thumb(aid):
 
 @app.post("/api/send")
 def send():
+    if request.headers.get("X-Requested-With")!="XMLHttpRequest":
+        return jsonify({"error":"Missing panel request header"}),403
     payload=request.get_json(silent=True) or {}
     ids=payload.get("ids",[])
     if not isinstance(ids,list) or not ids or not all(isinstance(i,str) and i.strip() for i in ids):
