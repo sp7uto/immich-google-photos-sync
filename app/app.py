@@ -1,4 +1,4 @@
-import os, sqlite3, threading, time, json, csv, io, tempfile
+import os, sqlite3, threading, time, json, csv, io, tempfile, hmac
 from pathlib import Path
 from flask import Flask, render_template, jsonify, request, Response
 import requests
@@ -12,6 +12,18 @@ IMMICH_KEY=os.getenv("IMMICH_API_KEY","")
 DEFAULT_ALBUM=os.getenv("SOURCE_ALBUM","Do Google Photos")
 PORT=int(os.getenv("PORT","8787"))
 app=Flask(__name__)
+
+# Optional HTTP Basic authentication. Configure PANEL_PASSWORD for remote access.
+PANEL_PASSWORD=os.getenv("PANEL_PASSWORD","")
+
+@app.before_request
+def require_panel_auth():
+    if not PANEL_PASSWORD:
+        return None
+    auth=request.authorization
+    if not auth or auth.type.lower()!="basic" or not hmac.compare_digest(auth.password or "",PANEL_PASSWORD):
+        return Response("Authentication required",401,{"WWW-Authenticate":'Basic realm="Immich Google Sync", charset="UTF-8"'})
+    return None
 
 @app.after_request
 def security_headers(response):
