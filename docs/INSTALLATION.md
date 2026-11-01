@@ -72,7 +72,7 @@ For a flagged asset, inspect Google Photos independently. The panel offers two e
 - **Potwierdź wysłanie**: use only when the asset was verified as present in Google Photos **and its actual Google media item ID is known**. The application records that ID and marks the asset as sent; it does not verify the ID against Google.
 - **Odblokuj ponowną wysyłkę**: use only when you have independently established that retrying will not create a duplicate. The asset is marked retryable (`error`); **no upload starts automatically**. Select and confirm it separately later.
 
-Resolution is refused while a transfer queue is running. The operation does not delete Immich or Google Photos media. Review decisions are logged in the in-memory application log, but the current database does not provide a tamper-proof audit history. Back up SQLite before manual reconciliation.
+Resolution is refused while a transfer queue is running. The operation does not delete Immich or Google Photos media. Review decisions are stored in a separate SQLite `review_audit` table in the same transaction as the status update. The **Decyzje CSV** link exports the decision history, including the previous status and any manually supplied Google media item ID. This is a durable operational record, **not** a tamper-proof audit log. Back up SQLite before manual reconciliation.
 
 
 ## Backup and upgrade
