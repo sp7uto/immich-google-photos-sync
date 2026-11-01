@@ -74,4 +74,4 @@ Open `http://YOUR-NAS-IP:8787` **only on a trusted LAN or via VPN**.
 - [Security](SECURITY.md)
 - [Changelog](CHANGELOG.md)
 
-**v3.0 — field-tested in a private Synology deployment.** Not affiliated with Immich or Google.
+**Release status:** Public source snapshot; the published Docker build has not yet been independently validated against a clean installation. Verify Google Photos API compatibility and authorization before relying on it for transfers. The private Synology deployment is a separate, previously configured instance. Not affiliated with Immich or Google.
