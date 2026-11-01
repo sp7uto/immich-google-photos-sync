@@ -59,7 +59,7 @@ The default Compose file binds the panel to **127.0.0.1 only**. Open `http://loc
 
 - Uploads go to the Google Photos library, **not a named Google album**.
 - OAuth token must be generated separately; no OAuth login screen.
-- **No built-in panel authentication or HTTPS. Never expose port 8787 publicly.**
+- Optional HTTP Basic authentication via `PANEL_PASSWORD` (protects panel and API). No built-in HTTPS; never expose port 8787 publicly.
 - Asset search uses a single page (up to 1,000 items).
 - SQLite state is local; this is not bidirectional sync.
 - Videos are disabled by default; RAW formats need testing.
