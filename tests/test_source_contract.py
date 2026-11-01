@@ -39,6 +39,15 @@ class SourceContractTests(unittest.TestCase):
         self.assertIn("cur.textContent=", self.html)
         self.assertNotIn("cur.innerHTML=", self.html)
 
+    def test_google_response_validation(self):
+        self.assertIn("if not token:", self.source)
+        self.assertIn("if len(results)!=1:", self.source)
+        self.assertIn("if not media_id:", self.source)
+
+    def test_control_command_validation(self):
+        self.assertIn('if cmd not in ("pause","resume","cancel"):', self.source)
+        self.assertIn('snapshot={**state,"logs":list(state["logs"])}', self.source)
+
     def test_secrets_not_hardcoded(self):
         self.assertIn('os.getenv("IMMICH_API_KEY"', self.source)
         self.assertNotIn("AIza", self.source)
