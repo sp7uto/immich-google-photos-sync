@@ -154,6 +154,13 @@ class SourceContractTests(unittest.TestCase):
         self.assertIn("button.review-action", self.html)
         self.assertIn("await load()", self.html)
 
+    def test_persistent_manual_review_audit(self):
+        self.assertIn("CREATE TABLE IF NOT EXISTS review_audit", self.source)
+        self.assertIn("INSERT INTO review_audit(", self.source)
+        self.assertIn('@app.get("/api/review-audit.csv")', self.source)
+        self.assertIn('href="/api/review-audit.csv"', self.html)
+        self.assertIn("previous_status", self.source)
+
     def test_secrets_not_hardcoded(self):
         self.assertIn('os.getenv("IMMICH_API_KEY"', self.source)
         self.assertNotIn("AIza", self.source)
