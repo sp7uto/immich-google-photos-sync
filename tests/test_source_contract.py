@@ -48,6 +48,11 @@ class SourceContractTests(unittest.TestCase):
         self.assertIn('if cmd not in ("pause","resume","cancel"):', self.source)
         self.assertIn('snapshot={**state,"logs":list(state["logs"])}', self.source)
 
+    def test_queue_startup_failure_cleanup(self):
+        self.assertIn("not ids or not all(", self.source)
+        self.assertIn('app.logger.exception("Unable to start transfer worker")', self.source)
+        self.assertIn('state["running"]=False', self.source)
+
     def test_secrets_not_hardcoded(self):
         self.assertIn('os.getenv("IMMICH_API_KEY"', self.source)
         self.assertNotIn("AIza", self.source)
