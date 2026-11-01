@@ -10,7 +10,7 @@ DB=DATA/"state.db"
 CFG=DATA/"config.json"
 IMMICH_URL=os.getenv("IMMICH_URL","").rstrip("/")
 IMMICH_KEY=os.getenv("IMMICH_API_KEY","")
-DEFAULT_ALBUM=os.getenv("SOURCE_ALBUM","Do Google Photos")
+DEFAULT_ALBUM=os.getenv("SOURCE_ALBUM","do publikacji")
 PORT=int(os.getenv("PORT","8787"))
 app=Flask(__name__)
 
@@ -86,7 +86,7 @@ def db():
     c.commit(); return c
 
 def cfg():
-    base={"source_album":DEFAULT_ALBUM,"google_album":"Immich Uploads","include_video":False,
+    base={"source_album":DEFAULT_ALBUM,"google_album":"do publikacji","include_video":False,
           "photo_ext":["jpg","jpeg","heic","png","webp"],"post_action":"keep","require_confirm":True}
     if CFG.exists():
         try: base.update(json.loads(CFG.read_text()))
