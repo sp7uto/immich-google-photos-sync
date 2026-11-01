@@ -79,6 +79,20 @@ class SourceContractTests(unittest.TestCase):
         self.assertIn('request.headers.get("Origin")', self.source)
         self.assertIn('"Cross-origin request blocked"', self.source)
 
+    def test_atomic_oauth_token_writes(self):
+        helper=(ROOT / "get_google_token.py").read_text(encoding="utf-8")
+        for source in (self.source, helper):
+            self.assertIn("tempfile.mkstemp(", source)
+            self.assertIn("os.fchmod(fd", source)
+            self.assertIn("os.fsync(output.fileno())", source)
+            self.assertIn("os.replace(temporary", source)
+        self.assertNotIn('(DATA/"token.json").write_text(', self.source)
+
+    def test_configuration_validation(self):
+        self.assertIn("changes=request.get_json(silent=True)", self.source)
+        self.assertIn("if set(changes)-allowed:", self.source)
+        self.assertIn('if key=="post_action" and value!="keep":', self.source)
+
     def test_secrets_not_hardcoded(self):
         self.assertIn('os.getenv("IMMICH_API_KEY"', self.source)
         self.assertNotIn("AIza", self.source)
