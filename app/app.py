@@ -94,9 +94,19 @@ def google_upload(asset, album):
     return res.get("mediaItem",{}).get("id","")
 
 def worker(ids):
+    try:
+        _run_worker(ids)
+    except Exception as exc:
+        log("BŁĄD kolejki: "+str(exc))
+    finally:
+        with lock:
+            state["running"]=False
+            state["current"]=""
+
+def _run_worker(ids):
     c=cfg(); aset={a["id"]:a for a in source_assets()}
     queue=[aset[i] for i in ids if i in aset and ext_ok(aset[i],c) and i not in sent_ids()]
-    with lock: state.update(running=True,paused=False,cancel=False,done=0,total=len(queue),current="")
+    with lock: state.update(total=len(queue))
     log(f"Start: {len(queue)} plików")
     con=db()
     for a in queue:
@@ -114,7 +124,6 @@ def worker(ids):
             log("BŁĄD  "+a.get("originalFileName","")+": "+str(e))
         with lock: state["done"]+=1
     con.close()
-    with lock: state["running"]=False; state["current"]=""
     log("Koniec kolejki.")
 
 @app.get("/")
@@ -137,8 +146,13 @@ def thumb(aid):
 
 @app.post("/api/send")
 def send():
-    if state["running"]: return jsonify({"error":"Synchronizacja już trwa"}),409
-    ids=request.json.get("ids",[])
+    payload=request.get_json(silent=True) or {}
+    ids=payload.get("ids",[])
+    if not isinstance(ids,list) or not all(isinstance(i,str) for i in ids):
+        return jsonify({"error":"Nieprawidłowa lista identyfikatorów"}),400
+    with lock:
+        if state["running"]: return jsonify({"error":"Synchronizacja już trwa"}),409
+        state.update(running=True,paused=False,cancel=False,done=0,total=0,current="")
     threading.Thread(target=worker,args=(ids,),daemon=True).start()
     return jsonify({"ok":True})
 
