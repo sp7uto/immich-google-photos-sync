@@ -29,7 +29,7 @@ function clearSel(){document.querySelectorAll('input[type=checkbox]').forEach(x=
 async function send(){let ids=[...document.querySelectorAll('input[type=checkbox]:checked')].map(x=>x.dataset.id);if(!ids.length)return alert('Nic nie zaznaczono.');
 if(!confirm(`Wysłać ${ids.length} wybranych plików do Google Photos?`))return;
 let r=await fetch('/api/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ids})});if(!r.ok)alert(await r.text())}
-async function ctrl(c){await fetch('/api/control/'+c,{method:'POST'})}
+async function ctrl(c){let r=await fetch('/api/control/'+c,{method:'POST',headers:{'X-Requested-With':'XMLHttpRequest'}});if(!r.ok)alert(await r.text())}
 async function backup(){let j=await (await fetch('/api/backup')).json();alert(j.ok?'Backup zapisany jako /data/state-backup.db':'Błąd')}
 async function poll(){let s=await (await fetch('/api/status')).json();prog.max=Math.max(s.total,1);prog.value=s.done;cur.textContent=`${s.running?'Praca':'Gotowy'} · ${s.done}/${s.total} ${s.paused?'· PAUZA':''} ${s.current?'· '+s.current:''}`;log.textContent=s.logs.join('\n');log.scrollTop=log.scrollHeight;if(!s.running&&window.wasRunning)load();window.wasRunning=s.running}
 load();setInterval(poll,1000);
