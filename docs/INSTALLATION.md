@@ -32,7 +32,28 @@ docker compose up -d --build
 docker compose logs --tail=100 immich-google-sync
 ```
 
-By default the Compose file binds port 8787 to **127.0.0.1** on the Docker host, so open `http://localhost:8787` locally. To reach the panel remotely, use an SSH tunnel or an authenticated reverse proxy over a trusted network. The panel has no authentication; **do not expose it publicly**. If you deliberately change the Compose bind address to a LAN IP, restrict access using a firewall.
+By default the Compose file binds port 8787 to **127.0.0.1** on the Docker host, so open `http://localhost:8787` locally. To reach the panel remotely, use an SSH tunnel or an authenticated reverse proxy over a trusted network. The panel supports optional Basic authentication, but has no built-in TLS; **do not expose it publicly**. If you deliberately change the Compose bind address to a LAN IP, restrict access using a firewall.
+
+## Optional non-root container hardening
+
+An opt-in `docker-compose.nonroot.yml` override runs the service under an explicitly chosen UID:GID, with a read-only root filesystem, dropped Linux capabilities, `no-new-privileges`, and a small private `/tmp` mount. **The standard Compose setup remains unchanged.**
+
+Before using the override, stop the service, back up `data/`, and identify a host UID:GID that already has read/write access to the existing `data/` directory and SQLite files, plus read access to `credentials.json` and `token.json`. The service must also be able to create temporary files and atomically replace `token.json` and `config.json` in `data/`. Do not change file ownership recursively or assume UID 1000 is correct. In particular, existing mode `0600` token files must be owned by the chosen UID or otherwise readable by it.
+
+After checking these prerequisites, set `APP_UID` and `APP_GID` in your local `.env`, then explicitly opt in:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.nonroot.yml config
+docker compose -f docker-compose.yml -f docker-compose.nonroot.yml up -d --build
+```
+
+For rollback to the original root-running configuration, remove the override from the command:
+
+```bash
+docker compose -f docker-compose.yml up -d --force-recreate
+```
+
+This is an optional deployment mode, not a tested migration procedure. It does not modify existing file ownership or secrets. Large uploads are temporarily staged in `data/`, so sufficient writable disk space is required.
 
 ## Operation
 
@@ -44,4 +65,4 @@ Back up `data/` securely, including the SQLite database and OAuth token. Before 
 
 ## Limitations
 
-The Google album setting is not applied to remote albums in v3.0. The application does not provide a public OAuth callback or an authenticated web panel.
+The Google album setting is not applied to remote albums in v3.0. The application does not provide a public OAuth callback. Panel authentication is optional via `PANEL_PASSWORD`.
