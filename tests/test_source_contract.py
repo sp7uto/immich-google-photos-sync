@@ -107,6 +107,16 @@ class SourceContractTests(unittest.TestCase):
         self.assertIn("with _auth_lock:", self.source)
         self.assertIn('Response("Too many authentication attempts",429', self.source)
 
+    def test_optional_nonroot_override(self):
+        override=(ROOT / "docker-compose.nonroot.yml").read_text(encoding="utf-8")
+        base=(ROOT / "docker-compose.yml").read_text(encoding="utf-8")
+        self.assertIn("APP_UID", override)
+        self.assertIn("APP_GID", override)
+        self.assertIn("read_only: true", override)
+        self.assertIn("no-new-privileges:true", override)
+        self.assertIn("cap_drop:", override)
+        self.assertNotIn("read_only: true", base)
+
     def test_secrets_not_hardcoded(self):
         self.assertIn('os.getenv("IMMICH_API_KEY"', self.source)
         self.assertNotIn("AIza", self.source)
