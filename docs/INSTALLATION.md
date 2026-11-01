@@ -61,7 +61,7 @@ Create an Immich album named as `SOURCE_ALBUM`, manually add images, preview and
 
 ## Interrupted or uncertain transfers
 
-Before contacting Google Photos, the application records the asset as `uploading` in SQLite. If the process stops unexpectedly, or an upload raises an error after the transfer starts, the item remains blocked from automatic retry (`uploading` or `needs_review`). The preview shows these items under **Do weryfikacji** rather than counting them as successfully sent.
+Before contacting Google Photos, the application records the asset as `uploading` in SQLite. If the process stops unexpectedly, or an upload raises an error after the transfer starts, the item remains blocked from automatic retry (`uploading` or `needs_review`). The preview shows these items under **Do weryfikacji**, separately from **Nowe** and successfully sent items. The **Do weryfikacji CSV** download provides asset IDs, filenames, timestamps, status and recorded errors without modifying transfer state.
 
 **Do not delete or edit these database records blindly.** Inspect the actual Google Photos library and the local CSV history before deciding what to do. The application currently has no automated reconciliation or explicit requeue operation for uncertain items. A failed transfer may not have created a Google item at all; the conservative block prevents accidental duplicates but may require manual recovery. Existing `error` records from older versions remain retryable.
 
