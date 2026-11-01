@@ -16,15 +16,35 @@ app=Flask(__name__)
 
 # Optional HTTP Basic authentication. Configure PANEL_PASSWORD for remote access.
 PANEL_PASSWORD=os.getenv("PANEL_PASSWORD","")
+AUTH_MAX_FAILURES=5
+AUTH_WINDOW_SECONDS=60
+AUTH_LOCK_SECONDS=60
+_auth_failures=[]
+_auth_locked_until=0.0
+_auth_lock=threading.Lock()
 
 @app.before_request
 def require_panel_auth():
+    global _auth_locked_until
     if not PANEL_PASSWORD:
         return None
-    auth=request.authorization
-    if not auth or auth.type.lower()!="basic" or not hmac.compare_digest(auth.password or "",PANEL_PASSWORD):
-        return Response("Authentication required",401,{"WWW-Authenticate":'Basic realm="Immich Google Sync", charset="UTF-8"'})
-    return None
+    now=time.monotonic()
+    with _auth_lock:
+        if now<_auth_locked_until:
+            return Response("Too many authentication attempts",429,{"Retry-After":str(AUTH_LOCK_SECONDS)})
+        _auth_failures[:]=[t for t in _auth_failures if now-t<AUTH_WINDOW_SECONDS]
+        auth=request.authorization
+        valid=(auth is not None and (auth.type or "").lower()=="basic" and
+               hmac.compare_digest(auth.password or "",PANEL_PASSWORD))
+        if valid:
+            _auth_failures.clear()
+            return None
+        _auth_failures.append(now)
+        if len(_auth_failures)>=AUTH_MAX_FAILURES:
+            _auth_locked_until=now+AUTH_LOCK_SECONDS
+            _auth_failures.clear()
+            return Response("Too many authentication attempts",429,{"Retry-After":str(AUTH_LOCK_SECONDS)})
+    return Response("Authentication required",401,{"WWW-Authenticate":'Basic realm="Immich Google Sync", charset="UTF-8"'})
 
 @app.before_request
 def reject_cross_origin_writes():
