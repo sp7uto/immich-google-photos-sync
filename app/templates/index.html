@@ -1,0 +1,34 @@
+<!doctype html><html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Immich → Google Photos v{{version}}</title>
+<style>
+body{font-family:system-ui;margin:0;background:#111;color:#eee}.wrap{max-width:1150px;margin:auto;padding:24px}
+h1{font-size:25px}.cards{display:flex;gap:12px;flex-wrap:wrap}.card{background:#1d1d1d;border-radius:12px;padding:15px;min-width:130px}
+.big{font-size:28px;font-weight:700}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}
+button,a.btn{border:0;border-radius:8px;padding:10px 14px;background:#eee;color:#111;text-decoration:none;cursor:pointer}
+.primary{font-weight:700}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.item{background:#1d1d1d;padding:8px;border-radius:10px}.item img{width:100%;height:120px;object-fit:cover;border-radius:7px}.sent{opacity:.42}
+.name{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}progress{width:100%;height:20px}
+pre{background:#080808;padding:12px;border-radius:10px;height:180px;overflow:auto;white-space:pre-wrap}
+small{color:#aaa}
+</style></head><body><div class="wrap">
+<h1>Immich → Google Photos <small>v{{version}} · Manual Select</small></h1>
+<div class="cards"><div class="card">W albumie<div class="big" id="total">–</div></div><div class="card">Nowe<div class="big" id="new">–</div></div><div class="card">Wysłane<div class="big" id="sent">–</div></div></div>
+<div class="toolbar"><button onclick="load()">Odśwież podgląd</button><button onclick="selectNew()">Zaznacz nowe</button><button onclick="clearSel()">Odznacz</button><button class="primary" onclick="send()">WYŚLIJ ZAZNACZONE</button><button onclick="ctrl('pause')">Pauza</button><button onclick="ctrl('resume')">Wznów</button><button onclick="ctrl('cancel')">Anuluj</button><a class="btn" href="/api/history.csv">Historia CSV</a><button onclick="backup()">Backup bazy</button></div>
+<progress id="prog" value="0" max="1"></progress><div id="cur"><small>Gotowy.</small></div>
+<h3>Podgląd przed wysłaniem</h3><div id="grid" class="grid"></div>
+<h3>Log na żywo</h3><pre id="log"></pre>
+</div><script>
+let items=[];
+async function load(){let r=await fetch('/api/preview');let j=await r.json();if(j.error){alert(j.error);return}
+items=j.items;total.textContent=j.total;newEl=document.getElementById('new');newEl.textContent=j.new;sent.textContent=j.sent;
+grid.innerHTML=items.map(x=>`<label class="item ${x.sent?'sent':''}"><img src="/thumb/${x.id}"><div><input type="checkbox" data-id="${x.id}" ${x.sent?'disabled':''}> ${x.sent?'✓ wysłane':'do wysłania'}</div><div class="name">${x.name}</div></label>`).join('')}
+function selectNew(){document.querySelectorAll('input[type=checkbox]:not(:disabled)').forEach(x=>x.checked=true)}
+function clearSel(){document.querySelectorAll('input[type=checkbox]').forEach(x=>x.checked=false)}
+async function send(){let ids=[...document.querySelectorAll('input[type=checkbox]:checked')].map(x=>x.dataset.id);if(!ids.length)return alert('Nic nie zaznaczono.');
+if(!confirm(`Wysłać ${ids.length} wybranych plików do Google Photos?`))return;
+let r=await fetch('/api/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ids})});if(!r.ok)alert(await r.text())}
+async function ctrl(c){await fetch('/api/control/'+c,{method:'POST'})}
+async function backup(){let j=await (await fetch('/api/backup')).json();alert(j.ok?'Backup zapisany jako /data/state-backup.db':'Błąd')}
+async function poll(){let s=await (await fetch('/api/status')).json();prog.max=Math.max(s.total,1);prog.value=s.done;cur.innerHTML=`<small>${s.running?'Praca':'Gotowy'} · ${s.done}/${s.total} ${s.paused?'· PAUZA':''} ${s.current?'· '+s.current:''}</small>`;log.textContent=s.logs.join('\n');log.scrollTop=log.scrollHeight;if(!s.running&&window.wasRunning)load();window.wasRunning=s.running}
+load();setInterval(poll,1000);
+</script></body></html>
