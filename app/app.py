@@ -79,6 +79,10 @@ def db():
     c.execute("""CREATE TABLE IF NOT EXISTS sent(
       asset_id TEXT PRIMARY KEY, checksum TEXT, filename TEXT, sent_at INTEGER,
       google_album TEXT, media_item_id TEXT, status TEXT DEFAULT 'sent', error TEXT)""")
+    c.execute("""CREATE TABLE IF NOT EXISTS review_audit(
+      id INTEGER PRIMARY KEY AUTOINCREMENT, asset_id TEXT NOT NULL,
+      reviewed_at INTEGER NOT NULL, previous_status TEXT NOT NULL,
+      decision TEXT NOT NULL, media_item_id TEXT)""")
     c.commit(); return c
 
 def cfg():
@@ -350,11 +354,26 @@ def resolve_review():
                 # Keep the row as an audit trail; 'error' remains retryable by the queue.
                 con.execute("UPDATE sent SET status='error',error=? WHERE asset_id=?",
                             ("Manually cleared for retry after external verification",aid))
+            con.execute("INSERT INTO review_audit(asset_id,reviewed_at,previous_status,decision,media_item_id) VALUES(?,?,?,?,?)",
+                        (aid,int(time.time()),row[0],decision,media_id.strip() if decision=="confirmed_sent" else None))
             con.commit()
         finally:
             con.close()
     log(f"Manual review: {aid} -> {decision}")
     return jsonify({"ok":True,"decision":decision})
+
+@app.get("/api/review-audit.csv")
+def review_audit_csv():
+    con=db()
+    try:
+        rows=con.execute("select asset_id,reviewed_at,previous_status,decision,media_item_id from review_audit order by id desc").fetchall()
+    finally:
+        con.close()
+    output=io.StringIO()
+    writer=csv.writer(output)
+    writer.writerow(["asset_id","reviewed_at","previous_status","decision","media_item_id"])
+    writer.writerows(rows)
+    return Response(output.getvalue(),mimetype="text/csv",headers={"Content-Disposition":"attachment; filename=immich-google-review-audit.csv"})
 
 @app.get("/api/review.csv")
 def review_csv():
