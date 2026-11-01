@@ -19,9 +19,11 @@ small{color:#aaa}
 <h3>Log na żywo</h3><pre id="log"></pre>
 </div><script>
 let items=[];
+function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function safeId(v){return encodeURIComponent(String(v??''))}
 async function load(){let r=await fetch('/api/preview');let j=await r.json();if(j.error){alert(j.error);return}
 items=j.items;total.textContent=j.total;newEl=document.getElementById('new');newEl.textContent=j.new;sent.textContent=j.sent;
-grid.innerHTML=items.map(x=>`<label class="item ${x.sent?'sent':''}"><img src="/thumb/${x.id}"><div><input type="checkbox" data-id="${x.id}" ${x.sent?'disabled':''}> ${x.sent?'✓ wysłane':'do wysłania'}</div><div class="name">${x.name}</div></label>`).join('')}
+grid.innerHTML=items.map(x=>`<label class="item ${x.sent?'sent':''}"><img src="/thumb/${safeId(x.id)}"><div><input type="checkbox" data-id="${escapeHtml(x.id)}" ${x.sent?'disabled':''}> ${x.sent?'✓ wysłane':'do wysłania'}</div><div class="name">${escapeHtml(x.name)}</div></label>`).join('')}
 function selectNew(){document.querySelectorAll('input[type=checkbox]:not(:disabled)').forEach(x=>x.checked=true)}
 function clearSel(){document.querySelectorAll('input[type=checkbox]').forEach(x=>x.checked=false)}
 async function send(){let ids=[...document.querySelectorAll('input[type=checkbox]:checked')].map(x=>x.dataset.id);if(!ids.length)return alert('Nic nie zaznaczono.');
@@ -29,6 +31,6 @@ if(!confirm(`Wysłać ${ids.length} wybranych plików do Google Photos?`))return
 let r=await fetch('/api/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ids})});if(!r.ok)alert(await r.text())}
 async function ctrl(c){await fetch('/api/control/'+c,{method:'POST'})}
 async function backup(){let j=await (await fetch('/api/backup')).json();alert(j.ok?'Backup zapisany jako /data/state-backup.db':'Błąd')}
-async function poll(){let s=await (await fetch('/api/status')).json();prog.max=Math.max(s.total,1);prog.value=s.done;cur.innerHTML=`<small>${s.running?'Praca':'Gotowy'} · ${s.done}/${s.total} ${s.paused?'· PAUZA':''} ${s.current?'· '+s.current:''}</small>`;log.textContent=s.logs.join('\n');log.scrollTop=log.scrollHeight;if(!s.running&&window.wasRunning)load();window.wasRunning=s.running}
+async function poll(){let s=await (await fetch('/api/status')).json();prog.max=Math.max(s.total,1);prog.value=s.done;cur.textContent=`${s.running?'Praca':'Gotowy'} · ${s.done}/${s.total} ${s.paused?'· PAUZA':''} ${s.current?'· '+s.current:''}`;log.textContent=s.logs.join('\n');log.scrollTop=log.scrollHeight;if(!s.running&&window.wasRunning)load();window.wasRunning=s.running}
 load();setInterval(poll,1000);
 </script></body></html>
