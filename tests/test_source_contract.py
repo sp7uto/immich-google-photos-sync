@@ -99,6 +99,14 @@ class SourceContractTests(unittest.TestCase):
         self.assertIn('request.headers.get("X-Requested-With")!="XMLHttpRequest"', self.source)
         self.assertIn("'X-Requested-With':'XMLHttpRequest'", self.html)
 
+    def test_auth_failure_cooldown(self):
+        self.assertIn("AUTH_MAX_FAILURES=5", self.source)
+        self.assertIn("AUTH_WINDOW_SECONDS=60", self.source)
+        self.assertIn("AUTH_LOCK_SECONDS=60", self.source)
+        self.assertIn("time.monotonic()", self.source)
+        self.assertIn("with _auth_lock:", self.source)
+        self.assertIn('Response("Too many authentication attempts",429', self.source)
+
     def test_secrets_not_hardcoded(self):
         self.assertIn('os.getenv("IMMICH_API_KEY"', self.source)
         self.assertNotIn("AIza", self.source)
