@@ -31,7 +31,7 @@ docker compose up -d --build
 docker compose logs --tail=100 immich-google-sync
 ```
 
-Open `http://NAS-LAN-IP:8787` from a trusted LAN or VPN. Do **not** expose the port publicly.
+By default the Compose file binds port 8787 to **127.0.0.1** on the Docker host, so open `http://localhost:8787` locally. To reach the panel remotely, use an SSH tunnel or an authenticated reverse proxy over a trusted network. The panel has no authentication; **do not expose it publicly**. If you deliberately change the Compose bind address to a LAN IP, restrict access using a firewall.
 
 ## Operation
 
