@@ -66,6 +66,12 @@ class SourceContractTests(unittest.TestCase):
         self.assertIn('response.headers["X-Frame-Options"]="DENY"', self.source)
         self.assertIn('response.headers["Referrer-Policy"]="no-referrer"', self.source)
 
+    def test_optional_panel_authentication(self):
+        self.assertIn("@app.before_request", self.source)
+        self.assertIn('PANEL_PASSWORD=os.getenv("PANEL_PASSWORD","")', self.source)
+        self.assertIn("hmac.compare_digest(", self.source)
+        self.assertIn('"WWW-Authenticate"', self.source)
+
     def test_secrets_not_hardcoded(self):
         self.assertIn('os.getenv("IMMICH_API_KEY"', self.source)
         self.assertNotIn("AIza", self.source)
