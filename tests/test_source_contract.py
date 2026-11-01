@@ -190,6 +190,12 @@ class SourceContractTests(unittest.TestCase):
         self.assertIn("j.config.google_album_id", self.html)
         self.assertIn("if(result.ok)await load()", self.html)
 
+    def test_queue_pins_destination_album(self):
+        self.assertIn('def google_upload(asset, album, album_id):', self.source)
+        self.assertIn('album_id=c.get("google_album_id")', self.source)
+        self.assertIn('mid=google_upload(a,c["google_album"],album_id)', self.source)
+        self.assertNotIn('album_id=cfg().get("google_album_id")', self.source)
+
     def test_secrets_not_hardcoded(self):
         self.assertIn('os.getenv("IMMICH_API_KEY"', self.source)
         self.assertNotIn("AIza", self.source)
