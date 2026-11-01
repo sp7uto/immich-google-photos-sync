@@ -1,4 +1,4 @@
-import os, sqlite3, threading, time, json, csv, io
+import os, sqlite3, threading, time, json, csv, io, tempfile
 from pathlib import Path
 from flask import Flask, render_template, jsonify, request, Response
 import requests
@@ -79,10 +79,19 @@ def google_upload(asset, album):
         cred.refresh(Request()); (DATA/"token.json").write_text(cred.to_json())
     h={"Authorization":f"Bearer {cred.token}","Content-Type":"application/octet-stream",
        "X-Goog-Upload-Protocol":"raw","X-Goog-Upload-File-Name":asset.get("originalFileName","photo")}
-    raw=requests.get(f"{IMMICH_URL}/api/assets/{asset['id']}/original",headers=ih(),stream=True,timeout=120)
-    raw.raise_for_status()
-    up=requests.post("https://photoslibrary.googleapis.com/v1/uploads",headers=h,data=raw.content,timeout=180)
-    up.raise_for_status()
+    # Stage the source on disk after 8 MiB, avoiding unbounded RAM usage.
+    # A seekable file lets requests supply Content-Length to Google Photos.
+    with requests.get(f"{IMMICH_URL}/api/assets/{asset['id']}/original",headers=ih(),stream=True,timeout=120) as raw:
+        raw.raise_for_status()
+        with tempfile.SpooledTemporaryFile(max_size=8*1024*1024,mode="w+b",dir=DATA) as upload_file:
+            for chunk in raw.iter_content(chunk_size=1024*1024):
+                if chunk:
+                    upload_file.write(chunk)
+            if upload_file.tell()==0:
+                raise RuntimeError("Immich returned an empty asset")
+            upload_file.seek(0)
+            up=requests.post("https://photoslibrary.googleapis.com/v1/uploads",headers=h,data=upload_file,timeout=180)
+            up.raise_for_status()
     token=up.text.strip()
     if not token:
         raise RuntimeError("Google Photos returned an empty upload token")
