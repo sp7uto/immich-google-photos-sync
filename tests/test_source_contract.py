@@ -183,6 +183,13 @@ class SourceContractTests(unittest.TestCase):
         self.assertIn('Cannot rename a configured destination album', self.source)
         self.assertIn('onclick="createAlbum()"', self.html)
 
+    def test_destination_preflight_and_visible_state(self):
+        self.assertIn('Najpierw skonfiguruj album docelowy Google Photos', self.source)
+        self.assertIn('if not cfg().get("google_album_id"):', self.source)
+        self.assertIn('id="albumState"', self.html)
+        self.assertIn("j.config.google_album_id", self.html)
+        self.assertIn("if(result.ok)await load()", self.html)
+
     def test_secrets_not_hardcoded(self):
         self.assertIn('os.getenv("IMMICH_API_KEY"', self.source)
         self.assertNotIn("AIza", self.source)
