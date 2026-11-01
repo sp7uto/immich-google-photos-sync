@@ -59,6 +59,12 @@ This is an optional deployment mode, not a tested migration procedure. It does n
 
 Create an Immich album named as `SOURCE_ALBUM`, manually add images, preview and select them in the panel, then confirm transfer. CSV history and SQLite backup are available in the interface.
 
+## Interrupted or uncertain transfers
+
+Before contacting Google Photos, the application records the asset as `uploading` in SQLite. If the process stops unexpectedly, or an upload raises an error after the transfer starts, the item remains blocked from automatic retry (`uploading` or `needs_review`). The preview shows these items under **Do weryfikacji** rather than counting them as successfully sent.
+
+**Do not delete or edit these database records blindly.** Inspect the actual Google Photos library and the local CSV history before deciding what to do. The application currently has no automated reconciliation or explicit requeue operation for uncertain items. A failed transfer may not have created a Google item at all; the conservative block prevents accidental duplicates but may require manual recovery. Existing `error` records from older versions remain retryable.
+
 ## Backup and upgrade
 
 Back up `data/` securely, including the SQLite database and OAuth token. Before upgrades, stop the container and retain a backup. Do not publish or commit your real `.env` or `data/`.
