@@ -208,6 +208,9 @@ def create_google_album():
     return jsonify({"ok":True,"album_id":album_id,"name":name})
 
 def google_upload(asset, album):
+    album_id=cfg().get("google_album_id")
+    if not album_id:
+        raise RuntimeError("Google destination album is not configured")
     cred=google_credentials()
     h={"Authorization":f"Bearer {cred.token}","Content-Type":"application/octet-stream",
        "X-Goog-Upload-Protocol":"raw","X-Goog-Upload-File-Name":asset.get("originalFileName","photo")}
@@ -227,9 +230,6 @@ def google_upload(asset, album):
     token=up.text.strip()
     if not token:
         raise RuntimeError("Google Photos returned an empty upload token")
-    album_id=cfg().get("google_album_id")
-    if not album_id:
-        raise RuntimeError("Google destination album is not configured; resolve upload token manually before retrying")
     body={"albumId":album_id,"newMediaItems":[{"description":"Uploaded from Immich","simpleMediaItem":{"uploadToken":token}}]}
     cr=requests.post("https://photoslibrary.googleapis.com/v1/mediaItems:batchCreate",
                      headers={"Authorization":f"Bearer {cred.token}","Content-Type":"application/json"},
@@ -364,7 +364,10 @@ def config():
             return jsonify({"error":"Invalid photo extensions"}),400
         if key=="post_action" and value!="keep":
             return jsonify({"error":"Unsupported post action"}),400
-    x=cfg(); x.update(changes); save_cfg(x); return jsonify(x)
+    x=cfg()
+    if x.get("google_album_id") and "google_album" in changes and changes["google_album"]!=x["google_album"]:
+        return jsonify({"error":"Cannot rename a configured destination album; existing album ID remains bound"}),409
+    x.update(changes); save_cfg(x); return jsonify(x)
 
 @app.post("/api/review/resolve")
 def resolve_review():
