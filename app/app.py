@@ -314,8 +314,10 @@ def history_csv():
     s=io.StringIO(); w=csv.writer(s); w.writerow(["filename","sent_at","google_album","status","error"]); w.writerows(rows)
     return Response(s.getvalue(),mimetype="text/csv",headers={"Content-Disposition":"attachment; filename=immich-google-history.csv"})
 
-@app.get("/api/backup")
+@app.post("/api/backup")
 def backup():
+    if request.headers.get("X-Requested-With")!="XMLHttpRequest":
+        return jsonify({"error":"Missing panel request header"}),403
     out=DATA/"state-backup.db"; src=db(); dst=sqlite3.connect(out); src.backup(dst); dst.close(); src.close()
     return jsonify({"ok":True,"path":"/data/state-backup.db"})
 
