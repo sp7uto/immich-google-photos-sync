@@ -144,6 +144,16 @@ class SourceContractTests(unittest.TestCase):
         self.assertIn("where status in ('uploading','needs_review') order by sent_at desc", self.source)
         self.assertIn('href="/api/review.csv"', self.html)
 
+    def test_manual_reconciliation_requires_confirmation(self):
+        self.assertIn('@app.post("/api/review/resolve")', self.source)
+        self.assertIn('confirmation!=f"{decision}:{aid}"', self.source)
+        self.assertIn('"confirmed_sent","retry"', self.source)
+        self.assertIn('if state["running"]:', self.source)
+        self.assertIn("status='sent',media_item_id=?", self.source)
+        self.assertIn("status='error',error=?", self.source)
+        self.assertIn("button.review-action", self.html)
+        self.assertIn("await load()", self.html)
+
     def test_secrets_not_hardcoded(self):
         self.assertIn('os.getenv("IMMICH_API_KEY"', self.source)
         self.assertNotIn("AIza", self.source)
