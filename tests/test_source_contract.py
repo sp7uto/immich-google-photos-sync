@@ -138,6 +138,12 @@ class SourceContractTests(unittest.TestCase):
         self.assertIn('id="review"', self.html)
         self.assertIn("x.sent||x.review", self.html)
 
+    def test_review_counts_and_csv(self):
+        self.assertIn('not x["sent"] and not x["review"]', self.source)
+        self.assertIn('@app.get("/api/review.csv")', self.source)
+        self.assertIn("where status in ('uploading','needs_review') order by sent_at desc", self.source)
+        self.assertIn('href="/api/review.csv"', self.html)
+
     def test_secrets_not_hardcoded(self):
         self.assertIn('os.getenv("IMMICH_API_KEY"', self.source)
         self.assertNotIn("AIza", self.source)
