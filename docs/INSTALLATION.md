@@ -18,7 +18,7 @@ Edit `.env`:
 
 - `IMMICH_URL`: Immich URL reachable **from the container**
 - `IMMICH_API_KEY`: Immich API key (keep secret)
-- `SOURCE_ALBUM`: source album name (default: `Do Google Photos`)
+- `SOURCE_ALBUM`: source album name (default: `do publikacji`)
 - `TZ`: timezone
 - `PORT`: Flask application port (default: 8787)
 - `PANEL_PASSWORD`: optional strong password enabling HTTP Basic authentication on all panel/API routes. Without it, the panel is unauthenticated; keep the default loopback-only binding. Basic authentication must be used only over HTTPS or a protected tunnel when accessing remotely.
@@ -56,6 +56,9 @@ docker compose -f docker-compose.yml up -d --force-recreate
 This is an optional deployment mode, not a tested migration procedure. It does not modify existing file ownership or secrets. Large uploads are temporarily staged in `data/`, so sufficient writable disk space is required.
 
 ## Operation
+
+The source Immich album and intended destination Google Photos album are both named `do publikacji`. The default Google album name is stored in configuration, but the current uploader **does not yet create or assign media to a Google Photos album**; uploads enter the library only. Do not treat the album name as proof of assignment.
+
 
 Create an Immich album named as `SOURCE_ALBUM`, manually add images, preview and select them in the panel, then confirm transfer. CSV history and SQLite backup are available in the interface.
 
