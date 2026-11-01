@@ -174,6 +174,15 @@ class SourceContractTests(unittest.TestCase):
         example=(ROOT / ".env.example").read_text(encoding="utf-8")
         self.assertIn("SOURCE_ALBUM=do publikacji", example)
 
+    def test_google_album_is_explicit_and_required(self):
+        self.assertIn('@app.post("/api/google-album/create")', self.source)
+        self.assertIn('payload.get("confirmation")!=f"CREATE:{name}"', self.source)
+        self.assertIn('"albumId":album_id', self.source)
+        self.assertIn('if not c.get("google_album_id"):', self.source)
+        self.assertIn('settings["google_album_id"]=album_id', self.source)
+        self.assertIn('Cannot rename a configured destination album', self.source)
+        self.assertIn('onclick="createAlbum()"', self.html)
+
     def test_secrets_not_hardcoded(self):
         self.assertIn('os.getenv("IMMICH_API_KEY"', self.source)
         self.assertNotIn("AIza", self.source)
