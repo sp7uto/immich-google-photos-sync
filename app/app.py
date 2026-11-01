@@ -318,6 +318,44 @@ def config():
             return jsonify({"error":"Unsupported post action"}),400
     x=cfg(); x.update(changes); save_cfg(x); return jsonify(x)
 
+@app.post("/api/review/resolve")
+def resolve_review():
+    if request.headers.get("X-Requested-With")!="XMLHttpRequest":
+        return jsonify({"error":"Missing panel request header"}),403
+    payload=request.get_json(silent=True)
+    if not isinstance(payload,dict):
+        return jsonify({"error":"Invalid request"}),400
+    aid=payload.get("asset_id")
+    decision=payload.get("decision")
+    confirmation=payload.get("confirmation")
+    media_id=payload.get("media_item_id")
+    if not isinstance(aid,str) or not aid.strip() or len(aid)>255:
+        return jsonify({"error":"Invalid asset ID"}),400
+    if decision not in ("confirmed_sent","retry") or confirmation!=f"{decision}:{aid}":
+        return jsonify({"error":"Explicit confirmation required"}),400
+    if decision=="confirmed_sent" and (not isinstance(media_id,str) or not media_id.strip() or len(media_id)>255):
+        return jsonify({"error":"Google media item ID required"}),400
+    with lock:
+        if state["running"]:
+            return jsonify({"error":"Cannot resolve while a queue is running"}),409
+        con=db()
+        try:
+            row=con.execute("select status from sent where asset_id=?",(aid,)).fetchone()
+            if not row or row[0] not in ("uploading","needs_review"):
+                return jsonify({"error":"Asset is not pending review"}),409
+            if decision=="confirmed_sent":
+                con.execute("UPDATE sent SET status='sent',media_item_id=?,error='' WHERE asset_id=?",
+                            (media_id.strip(),aid))
+            else:
+                # Keep the row as an audit trail; 'error' remains retryable by the queue.
+                con.execute("UPDATE sent SET status='error',error=? WHERE asset_id=?",
+                            ("Manually cleared for retry after external verification",aid))
+            con.commit()
+        finally:
+            con.close()
+    log(f"Manual review: {aid} -> {decision}")
+    return jsonify({"ok":True,"decision":decision})
+
 @app.get("/api/review.csv")
 def review_csv():
     con=db()
