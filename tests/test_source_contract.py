@@ -93,6 +93,12 @@ class SourceContractTests(unittest.TestCase):
         self.assertIn("if set(changes)-allowed:", self.source)
         self.assertIn('if key=="post_action" and value!="keep":', self.source)
 
+    def test_atomic_configuration_and_control_header(self):
+        self.assertIn('tempfile.mkstemp(prefix=".config-"', self.source)
+        self.assertIn("os.replace(temporary,CFG)", self.source)
+        self.assertIn('request.headers.get("X-Requested-With")!="XMLHttpRequest"', self.source)
+        self.assertIn("'X-Requested-With':'XMLHttpRequest'", self.html)
+
     def test_secrets_not_hardcoded(self):
         self.assertIn('os.getenv("IMMICH_API_KEY"', self.source)
         self.assertNotIn("AIza", self.source)
