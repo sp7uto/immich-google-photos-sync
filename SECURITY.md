@@ -12,6 +12,10 @@ This service is designed for a **trusted LAN or VPN only**. Its Flask web interf
 - Never commit credentials, tokens or actual local configuration.
 - Review outbound transfers before confirming.
 
+## Authentication attempt limits
+
+When `PANEL_PASSWORD` is enabled, five failed authentication requests within 60 seconds temporarily block **all** panel access for 60 seconds (HTTP 429). This is an in-memory, single-process safeguard, not a distributed rate limiter. It can also be triggered by an attacker to deny access temporarily. Do not expose the service directly to the internet; use an authenticated HTTPS reverse proxy or secure tunnel. The counter resets on application restart.
+
 ## Reporting
 
 Please report vulnerabilities privately to the repository maintainer instead of publishing exploitable details in an issue.
