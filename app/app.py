@@ -130,7 +130,7 @@ def ext_ok(a,c):
     return ext in c["photo_ext"]
 
 def sent_ids():
-    c=db(); rows={r[0] for r in c.execute("select asset_id from sent where status='sent'")}; c.close(); return rows
+    c=db(); rows={r[0] for r in c.execute("select asset_id from sent where status in ('sent','uploading','needs_review')")}; c.close(); return rows
 
 def log(s):
     with lock:
@@ -216,13 +216,16 @@ def _run_worker(ids):
             if state["cancel"]: log("Anulowano przed następnym plikiem."); break
             with lock: state["current"]=a.get("originalFileName",a["id"])
             try:
+                # Persist before contacting Google: interrupted uploads require manual review.
+                con.execute("INSERT OR REPLACE INTO sent(asset_id,filename,sent_at,google_album,status,error) VALUES(?,?,?,?,'uploading','')",
+                            (a["id"],a.get("originalFileName",""),int(time.time()),c["google_album"])); con.commit()
                 mid=google_upload(a,c["google_album"])
                 con.execute("INSERT OR REPLACE INTO sent(asset_id,filename,sent_at,google_album,media_item_id,status,error) VALUES(?,?,?,?,?,'sent','')",
                             (a["id"],a.get("originalFileName",""),int(time.time()),c["google_album"],mid)); con.commit()
                 log("OK  "+a.get("originalFileName",""))
             except Exception as e:
-                con.execute("INSERT OR REPLACE INTO sent(asset_id,filename,sent_at,google_album,status,error) VALUES(?,?,?,?, 'error',?)",
-                            (a["id"],a.get("originalFileName",""),int(time.time()),c["google_album"],str(e))); con.commit()
+                con.execute("UPDATE sent SET status='needs_review', error=? WHERE asset_id=?",
+                            (str(e),a["id"])); con.commit()
                 log("BŁĄD  "+a.get("originalFileName","")+": "+str(e))
             with lock: state["done"]+=1
     finally:
