@@ -106,6 +106,20 @@ def log(s):
         state["logs"].append(time.strftime("%H:%M:%S")+"  "+s)
         state["logs"]=state["logs"][-300:]
 
+def save_token_atomic(credentials):
+    target=DATA/"token.json"
+    fd, temporary=tempfile.mkstemp(prefix=".token-",suffix=".tmp",dir=DATA)
+    try:
+        os.fchmod(fd,0o600)
+        with os.fdopen(fd,"w",encoding="utf-8") as output:
+            output.write(credentials.to_json())
+            output.flush()
+            os.fsync(output.fileno())
+        os.replace(temporary,target)
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
+
 def google_ready():
     return (DATA/"credentials.json").exists() and (DATA/"token.json").exists()
 
@@ -114,7 +128,7 @@ def google_upload(asset, album):
     from google.auth.transport.requests import Request
     cred=Credentials.from_authorized_user_file(str(DATA/"token.json"))
     if cred.expired and cred.refresh_token:
-        cred.refresh(Request()); (DATA/"token.json").write_text(cred.to_json())
+        cred.refresh(Request()); save_token_atomic(cred)
     h={"Authorization":f"Bearer {cred.token}","Content-Type":"application/octet-stream",
        "X-Goog-Upload-Protocol":"raw","X-Goog-Upload-File-Name":asset.get("originalFileName","photo")}
     # Stage the source on disk after 8 MiB, avoiding unbounded RAM usage.
