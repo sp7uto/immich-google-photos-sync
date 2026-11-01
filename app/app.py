@@ -91,7 +91,10 @@ def google_upload(asset, album):
     res=cr.json()["newMediaItemResults"][0]
     if res.get("status",{}).get("code",0) not in (0,None):
         raise RuntimeError(str(res["status"]))
-    return res.get("mediaItem",{}).get("id","")
+    media_id=res.get("mediaItem",{}).get("id")
+    if not media_id:
+        raise RuntimeError("Google Photos did not return a media item ID")
+    return media_id
 
 def worker(ids):
     try:
@@ -105,25 +108,28 @@ def worker(ids):
 
 def _run_worker(ids):
     c=cfg(); aset={a["id"]:a for a in source_assets()}
-    queue=[aset[i] for i in ids if i in aset and ext_ok(aset[i],c) and i not in sent_ids()]
+    already_sent=sent_ids()
+    queue=[aset[i] for i in dict.fromkeys(ids) if i in aset and ext_ok(aset[i],c) and i not in already_sent]
     with lock: state.update(total=len(queue))
     log(f"Start: {len(queue)} plików")
     con=db()
-    for a in queue:
-        while state["paused"] and not state["cancel"]: time.sleep(.4)
-        if state["cancel"]: log("Anulowano przed następnym plikiem."); break
-        with lock: state["current"]=a.get("originalFileName",a["id"])
-        try:
-            mid=google_upload(a,c["google_album"])
-            con.execute("INSERT OR REPLACE INTO sent(asset_id,filename,sent_at,google_album,media_item_id,status,error) VALUES(?,?,?,?,?,'sent','')",
-                        (a["id"],a.get("originalFileName",""),int(time.time()),c["google_album"],mid)); con.commit()
-            log("OK  "+a.get("originalFileName",""))
-        except Exception as e:
-            con.execute("INSERT OR REPLACE INTO sent(asset_id,filename,sent_at,google_album,status,error) VALUES(?,?,?,?, 'error',?)",
-                        (a["id"],a.get("originalFileName",""),int(time.time()),c["google_album"],str(e))); con.commit()
-            log("BŁĄD  "+a.get("originalFileName","")+": "+str(e))
-        with lock: state["done"]+=1
-    con.close()
+    try:
+        for a in queue:
+            while state["paused"] and not state["cancel"]: time.sleep(.4)
+            if state["cancel"]: log("Anulowano przed następnym plikiem."); break
+            with lock: state["current"]=a.get("originalFileName",a["id"])
+            try:
+                mid=google_upload(a,c["google_album"])
+                con.execute("INSERT OR REPLACE INTO sent(asset_id,filename,sent_at,google_album,media_item_id,status,error) VALUES(?,?,?,?,?,'sent','')",
+                            (a["id"],a.get("originalFileName",""),int(time.time()),c["google_album"],mid)); con.commit()
+                log("OK  "+a.get("originalFileName",""))
+            except Exception as e:
+                con.execute("INSERT OR REPLACE INTO sent(asset_id,filename,sent_at,google_album,status,error) VALUES(?,?,?,?, 'error',?)",
+                            (a["id"],a.get("originalFileName",""),int(time.time()),c["google_album"],str(e))); con.commit()
+                log("BŁĄD  "+a.get("originalFileName","")+": "+str(e))
+            with lock: state["done"]+=1
+    finally:
+        con.close()
     log("Koniec kolejki.")
 
 @app.get("/")
