@@ -124,6 +124,12 @@ class SourceContractTests(unittest.TestCase):
         self.assertNotIn("docker-smoke:", workflow)
         self.assertIn("python -m unittest discover -s tests -v", workflow)
 
+    def test_backup_is_protected_write(self):
+        self.assertIn('@app.post("/api/backup")', self.source)
+        self.assertNotIn('@app.get("/api/backup")', self.source)
+        self.assertIn("fetch('/api/backup',{method:'POST'", self.html)
+        self.assertIn('request.headers.get("X-Requested-With")!="XMLHttpRequest"', self.source)
+
     def test_secrets_not_hardcoded(self):
         self.assertIn('os.getenv("IMMICH_API_KEY"', self.source)
         self.assertNotIn("AIza", self.source)
