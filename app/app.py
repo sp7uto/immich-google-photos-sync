@@ -255,7 +255,24 @@ def status():
 @app.route("/api/config",methods=["GET","POST"])
 def config():
     if request.method=="GET": return jsonify(cfg())
-    x=cfg(); x.update(request.json or {}); save_cfg(x); return jsonify(x)
+    changes=request.get_json(silent=True)
+    if not isinstance(changes,dict):
+        return jsonify({"error":"Configuration must be a JSON object"}),400
+    allowed={"source_album","google_album","include_video","photo_ext","post_action","require_confirm"}
+    if set(changes)-allowed:
+        return jsonify({"error":"Unknown configuration fields"}),400
+    for key,value in changes.items():
+        if key in ("source_album","google_album") and (not isinstance(value,str) or not value.strip() or len(value)>255):
+            return jsonify({"error":"Invalid album name"}),400
+        if key in ("include_video","require_confirm") and not isinstance(value,bool):
+            return jsonify({"error":"Invalid boolean setting"}),400
+        if key=="photo_ext" and (not isinstance(value,list) or not value or len(value)>32 or
+                                  any(not isinstance(ext,str) or not ext or len(ext)>16 or
+                                      not ext.isascii() or not ext.isalnum() for ext in value)):
+            return jsonify({"error":"Invalid photo extensions"}),400
+        if key=="post_action" and value!="keep":
+            return jsonify({"error":"Unsupported post action"}),400
+    x=cfg(); x.update(changes); save_cfg(x); return jsonify(x)
 
 @app.get("/api/history.csv")
 def history_csv():
