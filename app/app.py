@@ -159,12 +159,18 @@ def thumb(aid):
 def send():
     payload=request.get_json(silent=True) or {}
     ids=payload.get("ids",[])
-    if not isinstance(ids,list) or not all(isinstance(i,str) for i in ids):
+    if not isinstance(ids,list) or not ids or not all(isinstance(i,str) and i.strip() for i in ids):
         return jsonify({"error":"Nieprawidłowa lista identyfikatorów"}),400
     with lock:
         if state["running"]: return jsonify({"error":"Synchronizacja już trwa"}),409
         state.update(running=True,paused=False,cancel=False,done=0,total=0,current="")
-    threading.Thread(target=worker,args=(ids,),daemon=True).start()
+    try:
+        threading.Thread(target=worker,args=(ids,),daemon=True).start()
+    except Exception:
+        with lock:
+            state["running"]=False
+        app.logger.exception("Unable to start transfer worker")
+        return jsonify({"error":"Nie udało się uruchomić kolejki"}),500
     return jsonify({"ok":True})
 
 @app.post("/api/control/<cmd>")
