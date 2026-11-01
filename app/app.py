@@ -311,6 +311,8 @@ def send():
     ids=payload.get("ids",[])
     if not isinstance(ids,list) or not ids or not all(isinstance(i,str) and i.strip() for i in ids):
         return jsonify({"error":"Nieprawidłowa lista identyfikatorów"}),400
+    if not cfg().get("google_album_id"):
+        return jsonify({"error":"Najpierw skonfiguruj album docelowy Google Photos"}),409
     with lock:
         if state["running"]: return jsonify({"error":"Synchronizacja już trwa"}),409
         state.update(running=True,paused=False,cancel=False,done=0,total=0,current="")
