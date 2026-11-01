@@ -13,6 +13,15 @@ DEFAULT_ALBUM=os.getenv("SOURCE_ALBUM","Do Google Photos")
 PORT=int(os.getenv("PORT","8787"))
 app=Flask(__name__)
 
+@app.after_request
+def security_headers(response):
+    # The panel exposes private thumbnails, filenames, history and transfer controls.
+    response.headers["Cache-Control"]="no-store"
+    response.headers["X-Content-Type-Options"]="nosniff"
+    response.headers["X-Frame-Options"]="DENY"
+    response.headers["Referrer-Policy"]="no-referrer"
+    return response
+
 state={"running":False,"paused":False,"cancel":False,"current":"","done":0,"total":0,"logs":[]}
 lock=threading.Lock()
 
