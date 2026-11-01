@@ -118,11 +118,38 @@ def source_assets():
     al=next((a for a in albums() if a.get("albumName")==name),None)
     if not al: return []
     try:
-        r=requests.post(f"{IMMICH_URL}/api/search/metadata",headers={**ih(),"Content-Type":"application/json"},
-                        json={"albumIds":[al["id"]],"page":1,"size":1000},timeout=30)
-        if r.ok:
-            j=r.json(); return j.get("assets",{}).get("items",j.get("items",[]))
-    except: pass
+        page=1
+        found=[]
+        seen=set()
+        while True:
+            r=requests.post(f"{IMMICH_URL}/api/search/metadata",headers={**ih(),"Content-Type":"application/json"},
+                            json={"albumIds":[al["id"]],"page":page,"size":1000},timeout=30)
+            if not r.ok:
+                if page==1:
+                    break  # Older Immich versions may require the album-detail endpoint.
+                r.raise_for_status()  # Never silently return a partial album.
+            j=r.json()
+            section=j.get("assets",j)
+            items=section.get("items")
+            if not isinstance(items,list):
+                raise RuntimeError("Unexpected Immich search response; cannot verify complete album")
+            ids=[a.get("id") for a in items]
+            if any(not isinstance(i,str) or not i for i in ids) or len(ids)!=len(set(ids)) or seen.intersection(ids):
+                raise RuntimeError("Repeated or invalid Immich search results; refusing incomplete preview")
+            seen.update(ids)
+            found.extend(items)
+            next_page=section.get("nextPage")
+            if next_page is not None:
+                if not str(next_page).isdigit() or int(next_page)<=page:
+                    raise RuntimeError("Invalid Immich pagination cursor")
+                page=int(next_page)
+            elif len(items)==1000:
+                page+=1  # Also support Immich responses without nextPage.
+            else:
+                return found
+    except requests.RequestException:
+        if page!=1:
+            raise
     r=requests.get(f"{IMMICH_URL}/api/albums/{al['id']}",headers=ih(),timeout=30); r.raise_for_status()
     return r.json().get("assets",[])
 
