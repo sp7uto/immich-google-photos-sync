@@ -10,6 +10,37 @@ jobs:
       - name: Python syntax check
         run: |
           python -m py_compile app/app.py get_google_token.py
+      - name: Inline JavaScript syntax check (without execution)
+        run: |
+          python - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+
+          class Scripts(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.inside = False
+                  self.parts = []
+                  self.blocks = []
+              def handle_starttag(self, tag, attrs):
+                  if tag == "script" and not dict(attrs).get("src"):
+                      self.inside = True
+                      self.parts = []
+              def handle_data(self, data):
+                  if self.inside:
+                      self.parts.append(data)
+              def handle_endtag(self, tag):
+                  if tag == "script" and self.inside:
+                      self.blocks.append("".join(self.parts))
+                      self.inside = False
+
+          parser = Scripts()
+          parser.feed(Path("app/templates/index.html").read_text(encoding="utf-8"))
+          if not parser.blocks:
+              raise SystemExit("No inline JavaScript found")
+          Path("/tmp/immich-inline-script.js").write_text("\\n".join(parser.blocks), encoding="utf-8")
+          PY
+          node --check /tmp/immich-inline-script.js
       - name: Offline regression tests
         run: python -m unittest discover -s tests -v
       - name: Check for committed private data
