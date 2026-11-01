@@ -1,0 +1,13 @@
+services:
+  immich-google-sync:
+    build: .
+    container_name: immich-google-sync
+    restart: unless-stopped
+    ports:
+      - "8787:8787"
+    env_file:
+      - .env
+    volumes:
+      - ./data:/data
+    environment:
+      - TZ=${TZ:-Europe/Warsaw}
