@@ -117,10 +117,13 @@ class SourceContractTests(unittest.TestCase):
         self.assertIn("cap_drop:", override)
         self.assertNotIn("read_only: true", base)
 
-    def test_ci_does_not_run_simulated_containers(self):
+    def test_ci_runs_real_container_without_external_services(self):
         workflow=(ROOT / ".github" / "workflows" / "check.yml").read_text(encoding="utf-8")
         self.assertIn("docker build --tag immich-google-sync:ci .", workflow)
-        self.assertNotIn("docker run ", workflow)
+        self.assertIn("docker run --detach", workflow)
+        self.assertIn('request("/api/status")', workflow)
+        self.assertIn('request("/api/send", payload', workflow)
+        self.assertIn("docker rm -f", workflow)
         self.assertNotIn("docker-smoke:", workflow)
         self.assertIn("python -m unittest discover -s tests -v", workflow)
 
