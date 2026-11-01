@@ -25,7 +25,7 @@ flowchart LR
     D -->|Cancel| F[No upload]
 ```
 
-This independent Docker service reads assets from a designated Immich album (default: `Do Google Photos`), previews thumbnails in a local web panel, and uploads **only checked assets** after confirmation. Local SQLite state tracks successful uploads.
+This independent Docker service reads assets from a designated Immich album (default: `do publikacji`), previews thumbnails in a local web panel, and uploads **only checked assets** after confirmation. Local SQLite state tracks successful uploads.
 
 ## Highlights
 
@@ -49,7 +49,7 @@ The default Compose file binds the panel to **127.0.0.1 only**. Open `http://loc
 
 ## Workflow
 
-1. Create an Immich album named `Do Google Photos`.
+1. Create an Immich album named `do publikacji`.
 2. Add photos you intend to export.
 3. Review thumbnails in the local web panel.
 4. Check the files and press **Send selected**.
@@ -57,7 +57,7 @@ The default Compose file binds the panel to **127.0.0.1 only**. Open `http://loc
 
 ## Limitations of v3.0
 
-- Uploads go to the Google Photos library, **not a named Google album**.
+- The intended Google Photos album is `do publikacji`, but uploads currently go to the Google Photos library, **not yet into the named album**. Album assignment is pending implementation.
 - OAuth token must be generated separately; no OAuth login screen.
 - Optional HTTP Basic authentication via `PANEL_PASSWORD` (protects panel and API). No built-in HTTPS; never expose port 8787 publicly.
 - Asset search uses a single page (up to 1,000 items).
