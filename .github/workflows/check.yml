@@ -63,5 +63,55 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Build production image without starting containers
+      - name: Build production image
         run: docker build --tag immich-google-sync:ci .
+      - name: Start container and check real HTTP responses (no external services)
+        run: |
+          set -euo pipefail
+          name="immich-sync-smoke-${GITHUB_RUN_ID}"
+          trap 'docker rm -f "$name" >/dev/null 2>&1 || true' EXIT
+          docker run --detach --name "$name" --publish 127.0.0.1:18787:8787 immich-google-sync:ci
+          python - <<'PY'
+          import json
+          import time
+          import urllib.error
+          import urllib.request
+
+          base = "http://127.0.0.1:18787"
+          def request(path, data=None, headers=None):
+              req = urllib.request.Request(base + path, data=data, headers=headers or {})
+              try:
+                  with urllib.request.urlopen(req, timeout=2) as res:
+                      return res.status, res.read(), res.headers
+              except urllib.error.HTTPError as exc:
+                  return exc.code, exc.read(), exc.headers
+
+          for attempt in range(40):
+              try:
+                  status, body, headers = request("/api/status")
+                  if status == 200:
+                      break
+              except (OSError, TimeoutError):
+                  pass
+              time.sleep(0.5)
+          else:
+              raise SystemExit("Container did not become ready")
+
+          assert json.loads(body)["running"] is False
+          assert headers.get("Cache-Control") == "no-store"
+          status, body, _ = request("/")
+          assert status == 200 and b"Immich" in body
+          status, body, _ = request("/api/config")
+          assert status == 200 and json.loads(body)["google_album_id"] == ""
+
+          payload = json.dumps({"ids": ["no-real-asset"]}).encode()
+          status, _, _ = request("/api/send", payload, {"Content-Type": "application/json"})
+          assert status == 403, f"Expected CSRF guard, got {status}"
+          status, _, _ = request("/api/send", payload, {
+              "Content-Type": "application/json", "X-Requested-With": "XMLHttpRequest"
+          })
+          assert status == 409, f"Expected missing album guard, got {status}"
+          status, body, _ = request("/api/status")
+          assert status == 200 and json.loads(body)["running"] is False
+          print("Real container HTTP smoke checks passed; no external requests or uploads")
+          PY
