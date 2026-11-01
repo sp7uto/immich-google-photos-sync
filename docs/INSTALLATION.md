@@ -77,6 +77,10 @@ Resolution is refused while a transfer queue is running. The operation does not 
 
 ## Backup and upgrade
 
+The **Backup bazy** panel action writes `/data/state-backup.db` through a private (`0600`) temporary SQLite backup and replaces the previous backup only after the copy completes. The previous backup remains intact if the copy fails before replacement. This is a single rolling snapshot, not a versioned backup history.
+
+
+
 Back up `data/` securely, including the SQLite database and OAuth token. Before upgrades, stop the container and retain a backup. Do not publish or commit your real `.env` or `data/`.
 
 ## Limitations
