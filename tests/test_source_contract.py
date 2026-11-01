@@ -130,6 +130,14 @@ class SourceContractTests(unittest.TestCase):
         self.assertIn("fetch('/api/backup',{method:'POST'", self.html)
         self.assertIn('request.headers.get("X-Requested-With")!="XMLHttpRequest"', self.source)
 
+    def test_uncertain_uploads_are_not_retried(self):
+        self.assertIn("status in ('sent','uploading','needs_review')", self.source)
+        self.assertIn("status='needs_review'", self.source)
+        self.assertIn("mid=google_upload(a,c", self.source)
+        self.assertIn("statuses=transfer_statuses()", self.source)
+        self.assertIn('id="review"', self.html)
+        self.assertIn("x.sent||x.review", self.html)
+
     def test_secrets_not_hardcoded(self):
         self.assertIn('os.getenv("IMMICH_API_KEY"', self.source)
         self.assertNotIn("AIza", self.source)
