@@ -6,7 +6,7 @@ Aplikacja uruchamiana w Dockerze pozwala wybrać zdjęcia z albumu Immich i prze
 
 ## Jak to działa
 
-1. Utwórz w Immich album `Do Google Photos`.
+1. Utwórz w Immich album `do publikacji`.
 2. Dodaj do niego fotografie przeznaczone do wysłania.
 3. Otwórz panel aplikacji na porcie `8787` w zaufanej sieci.
 4. Sprawdź miniatury i zaznacz zdjęcia.
@@ -16,9 +16,9 @@ Program przechowuje historię wysyłek w lokalnej bazie SQLite. Umożliwia wstrz
 
 ## Ograniczenia
 
-- Zdjęcia trafiają do biblioteki Google Photos, nie do konkretnego albumu Google.
+- Docelowy album Google Photos ma nosić nazwę `do publikacji`, ale aktualny kod przesyła zdjęcia jedynie do biblioteki Google Photos. Przypisywanie do albumu docelowego nie jest jeszcze zaimplementowane.
 - Token OAuth trzeba uzyskać osobnym skryptem.
-- Panel nie ma własnego logowania ani HTTPS — **nie udostępniaj go publicznie**.
+- Panel obsługuje opcjonalne hasło `PANEL_PASSWORD`, lecz nie zapewnia własnego HTTPS — **nie udostępniaj go publicznie**.
 - Nie usuwa zdjęć z Immich.
 - Obsługa dużych albumów, wideo i RAW wymaga dodatkowych testów.
 
