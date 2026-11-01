@@ -45,7 +45,7 @@ mkdir -p data
 docker compose up -d --build
 ```
 
-Open `http://YOUR-NAS-IP:8787` **only on a trusted LAN or via VPN**.
+The default Compose file binds the panel to **127.0.0.1 only**. Open `http://localhost:8787` on the Docker host, or use an authenticated SSH tunnel / trusted VPN. For access from another machine, configure a secured reverse proxy or explicitly change the bind address; never publish the unauthenticated panel to the internet.
 
 ## Workflow
 
@@ -74,4 +74,4 @@ Open `http://YOUR-NAS-IP:8787` **only on a trusted LAN or via VPN**.
 - [Security](SECURITY.md)
 - [Changelog](CHANGELOG.md)
 
-**Release status:** Public source snapshot; the published Docker build has not yet been independently validated against a clean installation. Verify Google Photos API compatibility and authorization before relying on it for transfers. The private Synology deployment is a separate, previously configured instance. Not affiliated with Immich or Google.
+**Release status:** Public development snapshot; automated GitHub Actions checks have been reported passing for an earlier revision, but the current commit and real Google Photos transfers have not been independently verified. Verify Google Photos API compatibility and authorization before relying on it for transfers. The private Synology deployment is a separate, previously configured instance. Not affiliated with Immich or Google.
