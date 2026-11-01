@@ -65,6 +65,16 @@ Before contacting Google Photos, the application records the asset as `uploading
 
 **Do not delete or edit these database records blindly.** Inspect the actual Google Photos library and the local CSV history before deciding what to do. The application currently has no automated reconciliation or explicit requeue operation for uncertain items. A failed transfer may not have created a Google item at all; the conservative block prevents accidental duplicates but may require manual recovery. Existing `error` records from older versions remain retryable.
 
+### Manual resolution
+
+For a flagged asset, inspect Google Photos independently. The panel offers two explicit choices, each requiring a confirmation dialog and a typed confirmation string:
+
+- **Potwierdź wysłanie**: use only when the asset was verified as present in Google Photos **and its actual Google media item ID is known**. The application records that ID and marks the asset as sent; it does not verify the ID against Google.
+- **Odblokuj ponowną wysyłkę**: use only when you have independently established that retrying will not create a duplicate. The asset is marked retryable (`error`); **no upload starts automatically**. Select and confirm it separately later.
+
+Resolution is refused while a transfer queue is running. The operation does not delete Immich or Google Photos media. Review decisions are logged in the in-memory application log, but the current database does not provide a tamper-proof audit history. Back up SQLite before manual reconciliation.
+
+
 ## Backup and upgrade
 
 Back up `data/` securely, including the SQLite database and OAuth token. Before upgrades, stop the container and retain a backup. Do not publish or commit your real `.env` or `data/`.
