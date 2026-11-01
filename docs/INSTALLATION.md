@@ -57,7 +57,7 @@ This is an optional deployment mode, not a tested migration procedure. It does n
 
 ## Operation
 
-The source Immich album and intended destination Google Photos album are both named `do publikacji`. The default Google album name is stored in configuration, but the current uploader **does not yet create or assign media to a Google Photos album**; uploads enter the library only. Do not treat the album name as proof of assignment.
+The source Immich album and destination Google Photos album are both named `do publikacji`. Before the first transfer, use **Utwórz album Google Photos** in the panel, after checking that a duplicate album does not already exist. The action requires a typed confirmation and creates an **app-owned** Google Photos album; its ID is saved in `data/config.json`. Uploads use that ID in `mediaItems.batchCreate`. Until an ID is saved, the transfer queue refuses to start. Google restricts album management to app-created content. If album creation fails or its result cannot be saved, **check Google Photos before retrying**: a remote album might have been created even if the local ID was not recorded. Renaming the configured album in the application is blocked to avoid an ID/name mismatch.
 
 
 Create an Immich album named as `SOURCE_ALBUM`, manually add images, preview and select them in the panel, then confirm transfer. CSV history and SQLite backup are available in the interface.
