@@ -249,7 +249,7 @@ def preview():
     except Exception as e: return jsonify({"error":str(e)}),500
     items=[{"id":a["id"],"name":a.get("originalFileName",""),"sent":statuses.get(a["id"])=="sent","review":statuses.get(a["id"]) in ("uploading","needs_review"),
             "type":a.get("type",""),"size":a.get("exifInfo",{}).get("fileSizeInByte")} for a in aa]
-    return jsonify({"items":items,"total":len(items),"new":sum(not x["sent"] for x in items),
+    return jsonify({"items":items,"total":len(items),"new":sum(not x["sent"] and not x["review"] for x in items),
                     "sent":sum(x["sent"] for x in items),"review":sum(x["review"] for x in items),"config":c})
 
 @app.get("/thumb/<aid>")
