@@ -207,8 +207,7 @@ def create_google_album():
             return jsonify({"error":"Album creation was not confirmed locally. Check Google Photos before trying again."}),502
     return jsonify({"ok":True,"album_id":album_id,"name":name})
 
-def google_upload(asset, album):
-    album_id=cfg().get("google_album_id")
+def google_upload(asset, album, album_id):
     if not album_id:
         raise RuntimeError("Google destination album is not configured")
     cred=google_credentials()
@@ -257,7 +256,8 @@ def worker(ids):
 
 def _run_worker(ids):
     c=cfg()
-    if not c.get("google_album_id"):
+    album_id=c.get("google_album_id")
+    if not album_id:
         raise RuntimeError("Configure the destination Google Photos album before sending")
     aset={a["id"]:a for a in source_assets()}
     already_sent=sent_ids()
@@ -274,7 +274,7 @@ def _run_worker(ids):
                 # Persist before contacting Google: interrupted uploads require manual review.
                 con.execute("INSERT OR REPLACE INTO sent(asset_id,filename,sent_at,google_album,status,error) VALUES(?,?,?,?,'uploading','')",
                             (a["id"],a.get("originalFileName",""),int(time.time()),c["google_album"])); con.commit()
-                mid=google_upload(a,c["google_album"])
+                mid=google_upload(a,c["google_album"],album_id)
                 con.execute("INSERT OR REPLACE INTO sent(asset_id,filename,sent_at,google_album,media_item_id,status,error) VALUES(?,?,?,?,?,'sent','')",
                             (a["id"],a.get("originalFileName",""),int(time.time()),c["google_album"],mid)); con.commit()
                 log("OK  "+a.get("originalFileName",""))
