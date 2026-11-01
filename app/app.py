@@ -398,7 +398,24 @@ def history_csv():
 def backup():
     if request.headers.get("X-Requested-With")!="XMLHttpRequest":
         return jsonify({"error":"Missing panel request header"}),403
-    out=DATA/"state-backup.db"; src=db(); dst=sqlite3.connect(out); src.backup(dst); dst.close(); src.close()
+    out=DATA/"state-backup.db"
+    fd, temporary=tempfile.mkstemp(prefix=".state-backup-",suffix=".db",dir=DATA)
+    os.close(fd)
+    try:
+        os.chmod(temporary,0o600)
+        src=db()
+        try:
+            dst=sqlite3.connect(temporary)
+            try:
+                src.backup(dst)
+            finally:
+                dst.close()
+        finally:
+            src.close()
+        os.replace(temporary,out)
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
     return jsonify({"ok":True,"path":"/data/state-backup.db"})
 
 @app.get("/api/test")
