@@ -14,7 +14,7 @@ small{color:#aaa}
 <h1>Immich → Google Photos <small>v{{version}} · Manual Select</small></h1>
 <div class="cards"><div class="card">W albumie<div class="big" id="total">–</div></div><div class="card">Nowe<div class="big" id="new">–</div></div><div class="card">Wysłane<div class="big" id="sent">–</div></div></div>
 <div class="cards"><div class="card">Do weryfikacji<div class="big" id="review">–</div></div></div>
-<div class="toolbar"><button onclick="load()">Odśwież podgląd</button><button onclick="selectNew()">Zaznacz nowe</button><button onclick="clearSel()">Odznacz</button><button class="primary" onclick="send()">WYŚLIJ ZAZNACZONE</button><button onclick="ctrl('pause')">Pauza</button><button onclick="ctrl('resume')">Wznów</button><button onclick="ctrl('cancel')">Anuluj</button><a class="btn" href="/api/history.csv">Historia CSV</a><button onclick="backup()">Backup bazy</button></div>
+<div class="toolbar"><button onclick="load()">Odśwież podgląd</button><button onclick="selectNew()">Zaznacz nowe</button><button onclick="clearSel()">Odznacz</button><button class="primary" onclick="send()">WYŚLIJ ZAZNACZONE</button><button onclick="ctrl('pause')">Pauza</button><button onclick="ctrl('resume')">Wznów</button><button onclick="ctrl('cancel')">Anuluj</button><a class="btn" href="/api/history.csv">Historia CSV</a><a class="btn" href="/api/review.csv">Do weryfikacji CSV</a><button onclick="backup()">Backup bazy</button></div>
 <progress id="prog" value="0" max="1"></progress><div id="cur"><small>Gotowy.</small></div>
 <h3>Podgląd przed wysłaniem</h3><div id="grid" class="grid"></div>
 <h3>Log na żywo</h3><pre id="log"></pre>
