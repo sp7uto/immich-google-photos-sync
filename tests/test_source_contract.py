@@ -53,6 +53,14 @@ class SourceContractTests(unittest.TestCase):
         self.assertIn('app.logger.exception("Unable to start transfer worker")', self.source)
         self.assertIn('state["running"]=False', self.source)
 
+    def test_immich_album_pagination_is_complete_or_fails(self):
+        self.assertIn('while True:', self.source)
+        self.assertIn('"page":page,"size":1000', self.source)
+        self.assertIn('section.get("nextPage")', self.source)
+        self.assertIn('seen.intersection(ids)', self.source)
+        self.assertIn('r.raise_for_status()  # Never silently return a partial album.', self.source)
+        self.assertIn('return found', self.source)
+
     def test_large_file_memory_safety(self):
         self.assertIn("tempfile.SpooledTemporaryFile(", self.source)
         self.assertIn("raw.iter_content(chunk_size=1024*1024)", self.source)
