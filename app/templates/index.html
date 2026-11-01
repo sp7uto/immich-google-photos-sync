@@ -24,7 +24,18 @@ function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;',
 function safeId(v){return encodeURIComponent(String(v??''))}
 async function load(){let r=await fetch('/api/preview');let j=await r.json();if(j.error){alert(j.error);return}
 items=j.items;total.textContent=j.total;newEl=document.getElementById('new');newEl.textContent=j.new;sent.textContent=j.sent;document.getElementById("review").textContent=j.review;
-grid.innerHTML=items.map(x=>`<label class="item ${(x.sent||x.review)?'sent':''}"><img src="/thumb/${safeId(x.id)}"><div><input type="checkbox" data-id="${escapeHtml(x.id)}" ${(x.sent||x.review)?'disabled':''}> ${x.sent?'✓ wysłane':(x.review?'⚠ sprawdź w Google Photos':'do wysłania')}</div><div class="name">${escapeHtml(x.name)}</div></label>`).join('')}
+grid.innerHTML=items.map(x=>`<label class="item ${(x.sent||x.review)?'sent':''}"><img src="/thumb/${safeId(x.id)}"><div><input type="checkbox" data-id="${escapeHtml(x.id)}" ${(x.sent||x.review)?'disabled':''}> ${x.sent?'✓ wysłane':(x.review?'⚠ sprawdź w Google Photos':'do wysłania')}</div>${x.review?`<div><button type="button" class="review-action" data-action="confirmed_sent" data-asset="${escapeHtml(x.id)}">Potwierdź wysłanie</button><button type="button" class="review-action" data-action="retry" data-asset="${escapeHtml(x.id)}">Odblokuj ponowną wysyłkę</button></div>`:''}<div class="name">${escapeHtml(x.name)}</div></label>`).join('')}
+async function resolveReview(aid,decision){
+if(!confirm(decision==='retry'?'Czy sprawdzono Google Photos i potwierdzono brak zdjęcia? Zezwolić na ponowną wysyłkę?':'Czy potwierdzono obecność zdjęcia w Google Photos i znany jest jego identyfikator?'))return;
+let mediaId=null;
+if(decision==='confirmed_sent'){mediaId=prompt('Wpisz identyfikator media item z Google Photos:');if(!mediaId||!mediaId.trim())return;}
+let confirmation=prompt('Aby potwierdzić, wpisz dokładnie: '+decision+':'+aid);
+if(confirmation!==decision+':'+aid)return alert('Potwierdzenie niezgodne. Nie zmieniono stanu.');
+let r=await fetch('/api/review/resolve',{method:'POST',headers:{'Content-Type':'application/json','X-Requested-With':'XMLHttpRequest'},body:JSON.stringify({asset_id:aid,decision,confirmation,media_item_id:mediaId})});
+let result=await r.json();if(!r.ok)return alert(result.error||'Błąd');
+await load();
+}
+grid.addEventListener('click',event=>{let button=event.target.closest('button.review-action');if(!button)return;event.preventDefault();resolveReview(button.dataset.asset,button.dataset.action)});
 function selectNew(){document.querySelectorAll('input[type=checkbox]:not(:disabled)').forEach(x=>x.checked=true)}
 function clearSel(){document.querySelectorAll('input[type=checkbox]').forEach(x=>x.checked=false)}
 async function send(){let ids=[...document.querySelectorAll('input[type=checkbox]:checked')].map(x=>x.dataset.id);if(!ids.length)return alert('Nic nie zaznaczono.');
