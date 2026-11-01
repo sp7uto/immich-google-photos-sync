@@ -69,7 +69,18 @@ def cfg():
         except: pass
     return base
 
-def save_cfg(x): CFG.write_text(json.dumps(x,ensure_ascii=False,indent=2))
+def save_cfg(x):
+    fd, temporary=tempfile.mkstemp(prefix=".config-",suffix=".tmp",dir=DATA)
+    try:
+        os.fchmod(fd,0o600)
+        with os.fdopen(fd,"w",encoding="utf-8") as output:
+            json.dump(x,output,ensure_ascii=False,indent=2)
+            output.flush()
+            os.fsync(output.fileno())
+        os.replace(temporary,CFG)
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
 
 def ih():
     return {"x-api-key":IMMICH_KEY,"Accept":"application/json"}
@@ -236,6 +247,9 @@ def send():
 
 @app.post("/api/control/<cmd>")
 def control(cmd):
+    # Custom request header cannot be submitted by a cross-site HTML form.
+    if request.headers.get("X-Requested-With")!="XMLHttpRequest":
+        return jsonify({"error":"Missing panel request header"}),403
     if cmd not in ("pause","resume","cancel"):
         return jsonify({"error":"Unknown control command"}),400
     with lock:
