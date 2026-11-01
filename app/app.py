@@ -132,6 +132,13 @@ def ext_ok(a,c):
 def sent_ids():
     c=db(); rows={r[0] for r in c.execute("select asset_id from sent where status in ('sent','uploading','needs_review')")}; c.close(); return rows
 
+def transfer_statuses():
+    con=db()
+    try:
+        return dict(con.execute("select asset_id,status from sent"))
+    finally:
+        con.close()
+
 def log(s):
     with lock:
         state["logs"].append(time.strftime("%H:%M:%S")+"  "+s)
@@ -237,13 +244,13 @@ def home(): return render_template("index.html",version=APP_VERSION)
 
 @app.get("/api/preview")
 def preview():
-    c=cfg(); ss=sent_ids()
+    c=cfg(); statuses=transfer_statuses()
     try: aa=[a for a in source_assets() if ext_ok(a,c)]
     except Exception as e: return jsonify({"error":str(e)}),500
-    items=[{"id":a["id"],"name":a.get("originalFileName",""),"sent":a["id"] in ss,
+    items=[{"id":a["id"],"name":a.get("originalFileName",""),"sent":statuses.get(a["id"])=="sent","review":statuses.get(a["id"]) in ("uploading","needs_review"),
             "type":a.get("type",""),"size":a.get("exifInfo",{}).get("fileSizeInByte")} for a in aa]
     return jsonify({"items":items,"total":len(items),"new":sum(not x["sent"] for x in items),
-                    "sent":sum(x["sent"] for x in items),"config":c})
+                    "sent":sum(x["sent"] for x in items),"review":sum(x["review"] for x in items),"config":c})
 
 @app.get("/thumb/<aid>")
 def thumb(aid):
