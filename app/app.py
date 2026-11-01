@@ -86,7 +86,7 @@ def db():
     c.commit(); return c
 
 def cfg():
-    base={"source_album":DEFAULT_ALBUM,"google_album":"do publikacji","include_video":False,
+    base={"source_album":DEFAULT_ALBUM,"google_album":"do publikacji","google_album_id":"","include_video":False,
           "photo_ext":["jpg","jpeg","heic","png","webp"],"post_action":"keep","require_confirm":True}
     if CFG.exists():
         try: base.update(json.loads(CFG.read_text()))
@@ -165,12 +165,50 @@ def save_token_atomic(credentials):
 def google_ready():
     return (DATA/"credentials.json").exists() and (DATA/"token.json").exists()
 
-def google_upload(asset, album):
+def google_credentials():
     from google.oauth2.credentials import Credentials
     from google.auth.transport.requests import Request
     cred=Credentials.from_authorized_user_file(str(DATA/"token.json"))
     if cred.expired and cred.refresh_token:
         cred.refresh(Request()); save_token_atomic(cred)
+    if not cred.valid or not cred.token:
+        raise RuntimeError("Google Photos OAuth token is not valid")
+    return cred
+
+@app.post("/api/google-album/create")
+def create_google_album():
+    if request.headers.get("X-Requested-With")!="XMLHttpRequest":
+        return jsonify({"error":"Missing panel request header"}),403
+    payload=request.get_json(silent=True)
+    if not isinstance(payload,dict):
+        return jsonify({"error":"Invalid request"}),400
+    with lock:
+        if state["running"]:
+            return jsonify({"error":"Cannot create an album while transferring"}),409
+        settings=cfg()
+        name=settings["google_album"]
+        if settings.get("google_album_id"):
+            return jsonify({"error":"Destination album already configured"}),409
+        if payload.get("confirmation")!=f"CREATE:{name}":
+            return jsonify({"error":"Explicit album creation confirmation required"}),400
+        try:
+            cred=google_credentials()
+            response=requests.post("https://photoslibrary.googleapis.com/v1/albums",
+                                   headers={"Authorization":f"Bearer {cred.token}","Content-Type":"application/json"},
+                                   json={"album":{"title":name}},timeout=60)
+            response.raise_for_status()
+            album_id=response.json().get("id")
+            if not isinstance(album_id,str) or not album_id:
+                raise RuntimeError("Google Photos created album without returning an ID; check Google Photos before retrying")
+            settings["google_album_id"]=album_id
+            save_cfg(settings)
+        except Exception:
+            app.logger.exception("Google album creation failed; inspect Google Photos before retrying")
+            return jsonify({"error":"Album creation was not confirmed locally. Check Google Photos before trying again."}),502
+    return jsonify({"ok":True,"album_id":album_id,"name":name})
+
+def google_upload(asset, album):
+    cred=google_credentials()
     h={"Authorization":f"Bearer {cred.token}","Content-Type":"application/octet-stream",
        "X-Goog-Upload-Protocol":"raw","X-Goog-Upload-File-Name":asset.get("originalFileName","photo")}
     # Stage the source on disk after 8 MiB, avoiding unbounded RAM usage.
@@ -189,7 +227,10 @@ def google_upload(asset, album):
     token=up.text.strip()
     if not token:
         raise RuntimeError("Google Photos returned an empty upload token")
-    body={"newMediaItems":[{"description":"Uploaded from Immich","simpleMediaItem":{"uploadToken":token}}]}
+    album_id=cfg().get("google_album_id")
+    if not album_id:
+        raise RuntimeError("Google destination album is not configured; resolve upload token manually before retrying")
+    body={"albumId":album_id,"newMediaItems":[{"description":"Uploaded from Immich","simpleMediaItem":{"uploadToken":token}}]}
     cr=requests.post("https://photoslibrary.googleapis.com/v1/mediaItems:batchCreate",
                      headers={"Authorization":f"Bearer {cred.token}","Content-Type":"application/json"},
                      json=body,timeout=60); cr.raise_for_status()
@@ -215,7 +256,10 @@ def worker(ids):
             state["current"]=""
 
 def _run_worker(ids):
-    c=cfg(); aset={a["id"]:a for a in source_assets()}
+    c=cfg()
+    if not c.get("google_album_id"):
+        raise RuntimeError("Configure the destination Google Photos album before sending")
+    aset={a["id"]:a for a in source_assets()}
     already_sent=sent_ids()
     queue=[aset[i] for i in dict.fromkeys(ids) if i in aset and ext_ok(aset[i],c) and i not in already_sent]
     with lock: state.update(total=len(queue))
