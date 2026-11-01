@@ -33,6 +33,12 @@ class SourceContractTests(unittest.TestCase):
         self.assertIn('with lock:\n        if state["running"]:', self.source)
         self.assertIn('finally:\n        with lock:', self.source)
 
+    def test_filename_escaping_and_status_safety(self):
+        self.assertIn("escapeHtml(x.name)", self.html)
+        self.assertIn("escapeHtml(x.id)", self.html)
+        self.assertIn("cur.textContent=", self.html)
+        self.assertNotIn("cur.innerHTML=", self.html)
+
     def test_secrets_not_hardcoded(self):
         self.assertIn('os.getenv("IMMICH_API_KEY"', self.source)
         self.assertNotIn("AIza", self.source)
