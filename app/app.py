@@ -1,4 +1,5 @@
 import os, sqlite3, threading, time, json, csv, io, tempfile, hmac
+from urllib.parse import urlsplit
 from pathlib import Path
 from flask import Flask, render_template, jsonify, request, Response
 import requests
@@ -23,6 +24,22 @@ def require_panel_auth():
     auth=request.authorization
     if not auth or auth.type.lower()!="basic" or not hmac.compare_digest(auth.password or "",PANEL_PASSWORD):
         return Response("Authentication required",401,{"WWW-Authenticate":'Basic realm="Immich Google Sync", charset="UTF-8"'})
+    return None
+
+@app.before_request
+def reject_cross_origin_writes():
+    if request.method not in ("POST","PUT","PATCH","DELETE"):
+        return None
+    if request.headers.get("Sec-Fetch-Site","").lower()=="cross-site":
+        return jsonify({"error":"Cross-site request blocked"}),403
+    origin=request.headers.get("Origin")
+    if origin:
+        try:
+            source=urlsplit(origin)
+            if source.scheme not in ("http","https") or source.netloc.lower()!=request.host.lower():
+                return jsonify({"error":"Cross-origin request blocked"}),403
+        except ValueError:
+            return jsonify({"error":"Invalid Origin header"}),403
     return None
 
 @app.after_request
