@@ -1,0 +1,7 @@
+.env
+.env.*
+!.env.example
+**/credentials.json
+**/token.json
+**/*.sqlite*
+**/__pycache__/
