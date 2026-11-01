@@ -318,6 +318,19 @@ def config():
             return jsonify({"error":"Unsupported post action"}),400
     x=cfg(); x.update(changes); save_cfg(x); return jsonify(x)
 
+@app.get("/api/review.csv")
+def review_csv():
+    con=db()
+    try:
+        rows=con.execute("select asset_id,filename,sent_at,google_album,status,error from sent where status in ('uploading','needs_review') order by sent_at desc").fetchall()
+    finally:
+        con.close()
+    output=io.StringIO()
+    writer=csv.writer(output)
+    writer.writerow(["asset_id","filename","sent_at","google_album","status","error"])
+    writer.writerows(rows)
+    return Response(output.getvalue(),mimetype="text/csv",headers={"Content-Disposition":"attachment; filename=immich-google-review.csv"})
+
 @app.get("/api/history.csv")
 def history_csv():
     con=db(); rows=con.execute("select filename,sent_at,google_album,status,error from sent order by sent_at desc").fetchall(); con.close()
