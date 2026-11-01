@@ -168,6 +168,12 @@ class SourceContractTests(unittest.TestCase):
         self.assertIn('os.replace(temporary,out)', self.source)
         self.assertIn('os.unlink(temporary)', self.source)
 
+    def test_publication_album_defaults(self):
+        self.assertIn('os.getenv("SOURCE_ALBUM","do publikacji")', self.source)
+        self.assertIn('"google_album":"do publikacji"', self.source)
+        example=(ROOT / ".env.example").read_text(encoding="utf-8")
+        self.assertIn("SOURCE_ALBUM=do publikacji", example)
+
     def test_secrets_not_hardcoded(self):
         self.assertIn('os.getenv("IMMICH_API_KEY"', self.source)
         self.assertNotIn("AIza", self.source)
