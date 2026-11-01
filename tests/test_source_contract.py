@@ -72,6 +72,13 @@ class SourceContractTests(unittest.TestCase):
         self.assertIn("hmac.compare_digest(", self.source)
         self.assertIn('"WWW-Authenticate"', self.source)
 
+    def test_cross_origin_write_guard(self):
+        self.assertIn("def reject_cross_origin_writes():", self.source)
+        self.assertIn('request.method not in ("POST","PUT","PATCH","DELETE")', self.source)
+        self.assertIn('request.headers.get("Sec-Fetch-Site","")', self.source)
+        self.assertIn('request.headers.get("Origin")', self.source)
+        self.assertIn('"Cross-origin request blocked"', self.source)
+
     def test_secrets_not_hardcoded(self):
         self.assertIn('os.getenv("IMMICH_API_KEY"', self.source)
         self.assertNotIn("AIza", self.source)
