@@ -51,13 +51,13 @@ The default Compose file binds the panel to **127.0.0.1 only**. Open `http://loc
 
 1. Create an Immich album named `do publikacji`.
 2. Add photos you intend to export.
-3. Review thumbnails in the local web panel.
+3. In the panel, explicitly create the destination Google Photos album `do publikacji` (check first that no duplicate album exists). Review thumbnails.
 4. Check the files and press **Send selected**.
 5. Follow progress and export history if needed.
 
 ## Limitations of v3.0
 
-- The intended Google Photos album is `do publikacji`, but uploads currently go to the Google Photos library, **not yet into the named album**. Album assignment is pending implementation.
+- The intended Google Photos album is `do publikacji`. The panel can explicitly create a new app-owned album, then uploads use its saved album ID. Until that setup is completed, the transfer queue refuses to start.
 - OAuth token must be generated separately; no OAuth login screen.
 - Optional HTTP Basic authentication via `PANEL_PASSWORD` (protects panel and API). No built-in HTTPS; never expose port 8787 publicly.
 - Asset search uses a single page (up to 1,000 items).
