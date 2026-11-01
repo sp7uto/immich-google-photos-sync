@@ -59,6 +59,13 @@ class SourceContractTests(unittest.TestCase):
         self.assertIn("upload_file.seek(0)", self.source)
         self.assertNotIn("data=raw.content", self.source)
 
+    def test_private_response_headers(self):
+        self.assertIn("@app.after_request", self.source)
+        self.assertIn('response.headers["Cache-Control"]="no-store"', self.source)
+        self.assertIn('response.headers["X-Content-Type-Options"]="nosniff"', self.source)
+        self.assertIn('response.headers["X-Frame-Options"]="DENY"', self.source)
+        self.assertIn('response.headers["Referrer-Policy"]="no-referrer"', self.source)
+
     def test_secrets_not_hardcoded(self):
         self.assertIn('os.getenv("IMMICH_API_KEY"', self.source)
         self.assertNotIn("AIza", self.source)
