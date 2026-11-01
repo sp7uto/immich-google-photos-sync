@@ -161,6 +161,13 @@ class SourceContractTests(unittest.TestCase):
         self.assertIn('href="/api/review-audit.csv"', self.html)
         self.assertIn("previous_status", self.source)
 
+    def test_atomic_sqlite_backup(self):
+        self.assertIn('tempfile.mkstemp(prefix=".state-backup-"', self.source)
+        self.assertIn('src.backup(dst)', self.source)
+        self.assertIn('os.chmod(temporary,0o600)', self.source)
+        self.assertIn('os.replace(temporary,out)', self.source)
+        self.assertIn('os.unlink(temporary)', self.source)
+
     def test_secrets_not_hardcoded(self):
         self.assertIn('os.getenv("IMMICH_API_KEY"', self.source)
         self.assertNotIn("AIza", self.source)
