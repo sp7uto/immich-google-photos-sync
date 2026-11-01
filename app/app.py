@@ -83,12 +83,17 @@ def google_upload(asset, album):
     raw.raise_for_status()
     up=requests.post("https://photoslibrary.googleapis.com/v1/uploads",headers=h,data=raw.content,timeout=180)
     up.raise_for_status()
-    token=up.text
+    token=up.text.strip()
+    if not token:
+        raise RuntimeError("Google Photos returned an empty upload token")
     body={"newMediaItems":[{"description":"Uploaded from Immich","simpleMediaItem":{"uploadToken":token}}]}
     cr=requests.post("https://photoslibrary.googleapis.com/v1/mediaItems:batchCreate",
                      headers={"Authorization":f"Bearer {cred.token}","Content-Type":"application/json"},
                      json=body,timeout=60); cr.raise_for_status()
-    res=cr.json()["newMediaItemResults"][0]
+    results=cr.json().get("newMediaItemResults",[])
+    if len(results)!=1:
+        raise RuntimeError("Google Photos returned an unexpected number of media results")
+    res=results[0]
     if res.get("status",{}).get("code",0) not in (0,None):
         raise RuntimeError(str(res["status"]))
     media_id=res.get("mediaItem",{}).get("id")
@@ -164,13 +169,21 @@ def send():
 
 @app.post("/api/control/<cmd>")
 def control(cmd):
-    if cmd=="pause": state["paused"]=True
-    elif cmd=="resume": state["paused"]=False
-    elif cmd=="cancel": state["cancel"]=True; state["paused"]=False
+    if cmd not in ("pause","resume","cancel"):
+        return jsonify({"error":"Unknown control command"}),400
+    with lock:
+        if cmd=="pause": state["paused"]=True
+        elif cmd=="resume": state["paused"]=False
+        else:
+            state["cancel"]=True
+            state["paused"]=False
     return jsonify({"ok":True})
 
 @app.get("/api/status")
-def status(): return jsonify(state)
+def status():
+    with lock:
+        snapshot={**state,"logs":list(state["logs"])}
+    return jsonify(snapshot)
 
 @app.route("/api/config",methods=["GET","POST"])
 def config():
