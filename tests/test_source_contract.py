@@ -53,6 +53,12 @@ class SourceContractTests(unittest.TestCase):
         self.assertIn('app.logger.exception("Unable to start transfer worker")', self.source)
         self.assertIn('state["running"]=False', self.source)
 
+    def test_large_file_memory_safety(self):
+        self.assertIn("tempfile.SpooledTemporaryFile(", self.source)
+        self.assertIn("raw.iter_content(chunk_size=1024*1024)", self.source)
+        self.assertIn("upload_file.seek(0)", self.source)
+        self.assertNotIn("data=raw.content", self.source)
+
     def test_secrets_not_hardcoded(self):
         self.assertIn('os.getenv("IMMICH_API_KEY"', self.source)
         self.assertNotIn("AIza", self.source)
