@@ -21,6 +21,7 @@ Edit `.env`:
 - `SOURCE_ALBUM`: source album name (default: `Do Google Photos`)
 - `TZ`: timezone
 - `PORT`: Flask application port (default: 8787)
+- `PANEL_PASSWORD`: optional strong password enabling HTTP Basic authentication on all panel/API routes. Without it, the panel is unauthenticated; keep the default loopback-only binding. Basic authentication must be used only over HTTPS or a protected tunnel when accessing remotely.
 
 Generate `token.json` with the [OAuth guide](GOOGLE-OAUTH.md). Put `credentials.json` and `token.json` in `data/`. Protect the directory.
 
