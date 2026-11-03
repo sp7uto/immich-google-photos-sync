@@ -13,7 +13,7 @@ small{color:#aaa}
 </style></head><body><div class="wrap">
 <h1>Immich → Google Photos <small>v{{version}} · Manual Select</small></h1>
 <div class="cards"><div class="card">W albumie<div class="big" id="total">–</div></div><div class="card">Nowe<div class="big" id="new">–</div></div><div class="card">Wysłane<div class="big" id="sent">–</div></div></div>
-<div class="cards"><div class="card">Do weryfikacji<div class="big" id="review">–</div></div></div>
+<details id="reviewPanel"><summary>Archiwum spraw do weryfikacji: <strong id="review">–</strong> (nie są ponownie wysyłane)</summary><div id="reviewGrid" class="grid"></div></details>
 <div class="toolbar"><button onclick="createAlbum()">Utwórz album Google Photos</button><button onclick="load()">Odśwież podgląd</button><button onclick="selectNew()">Zaznacz nowe</button><button onclick="clearSel()">Odznacz</button><button class="primary" onclick="send()">WYŚLIJ ZAZNACZONE</button><button onclick="ctrl('pause')">Pauza</button><button onclick="ctrl('resume')">Wznów</button><button onclick="ctrl('cancel')">Anuluj</button><a class="btn" href="/api/history.csv">Historia CSV</a><a class="btn" href="/api/review.csv">Do weryfikacji CSV</a><a class="btn" href="/api/review-audit.csv">Decyzje CSV</a><button onclick="backup()">Backup bazy</button><button onclick="clearSession()">Wyczyść widok sesji</button></div>
 <progress id="prog" value="0" max="1"></progress><div id="cur"><small>Gotowy.</small></div>
 <div id="albumState"><small>Sprawdzanie albumu docelowego…</small></div>
@@ -25,7 +25,8 @@ function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;',
 function safeId(v){return encodeURIComponent(String(v??''))}
 async function load(){let r=await fetch('/api/preview');let j=await r.json();if(j.error){alert(j.error);return}
 items=j.items;albumState.textContent=j.config.google_album_id?'Album Google Photos: '+j.config.google_album+' (skonfigurowany)':'Album Google Photos: '+j.config.google_album+' — wymagane utworzenie przed wysyłką';total.textContent=j.total;newEl=document.getElementById('new');newEl.textContent=j.new;sent.textContent=j.sent;document.getElementById("review").textContent=j.review;
-grid.innerHTML=items.map(x=>`<div class="item ${(x.sent||x.review)?'sent':''}"><img src="/thumb/${safeId(x.id)}"><div><input type="checkbox" data-id="${escapeHtml(x.id)}" ${(x.sent||x.review)?'disabled':''}> ${x.sent?'✓ wysłane':(x.review?'⚠ sprawdź w Google Photos':'do wysłania')}</div>${x.review?`<div><button type="button" class="review-action" data-action="confirmed_sent" data-asset="${escapeHtml(x.id)}">Potwierdź wysłanie</button><button type="button" class="review-action" data-action="retry" data-asset="${escapeHtml(x.id)}">Odblokuj ponowną wysyłkę</button></div>`:''}<div class="name">${escapeHtml(x.name)}</div></div>`).join('')}
+grid.innerHTML=items.filter(x=>!x.review).map(x=>`<div class="item ${(x.sent||x.review)?'sent':''}"><img src="/thumb/${safeId(x.id)}"><div><input type="checkbox" data-id="${escapeHtml(x.id)}" ${(x.sent||x.review)?'disabled':''}> ${x.sent?'✓ wysłane':(x.review?'⚠ sprawdź w Google Photos':'do wysłania')}</div>${x.review?`<div><button type="button" class="review-action" data-action="confirmed_sent" data-asset="${escapeHtml(x.id)}">Potwierdź wysłanie</button><button type="button" class="review-action" data-action="retry" data-asset="${escapeHtml(x.id)}">Odblokuj ponowną wysyłkę</button></div>`:''}<div class="name">${escapeHtml(x.name)}</div></div>`).join('');
+reviewGrid.innerHTML=items.filter(x=>x.review).map(x=>`<div class="item sent"><img src="/thumb/${safeId(x.id)}"><div>⚠ sprawdź w Google Photos</div><div><button type="button" class="review-action" data-action="confirmed_sent" data-asset="${escapeHtml(x.id)}">Potwierdź wysłanie</button><button type="button" class="review-action" data-action="retry" data-asset="${escapeHtml(x.id)}">Odblokuj ponowną wysyłkę</button></div><div class="name">${escapeHtml(x.name)}</div></div>`).join('')}
 async function resolveReview(aid,decision){
 if(!confirm(decision==='retry'?'Czy sprawdzono Google Photos i potwierdzono brak zdjęcia? Zezwolić na ponowną wysyłkę?':'Czy potwierdzono obecność zdjęcia w Google Photos i znany jest jego identyfikator?'))return;
 let mediaId=null;
@@ -36,7 +37,7 @@ let r=await fetch('/api/review/resolve',{method:'POST',headers:{'Content-Type':'
 let result=await r.json();if(!r.ok)return alert(result.error||'Błąd');
 await load();
 }
-grid.addEventListener('click',event=>{let button=event.target.closest('button.review-action');if(!button)return;event.preventDefault();resolveReview(button.dataset.asset,button.dataset.action)});
+document.addEventListener('click',event=>{let button=event.target.closest('button.review-action');if(!button)return;event.preventDefault();resolveReview(button.dataset.asset,button.dataset.action)});
 async function createAlbum(){
 let r=await fetch('/api/config');let c=await r.json();
 if(c.google_album_id)return alert('Album docelowy jest już skonfigurowany.');
