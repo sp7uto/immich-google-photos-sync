@@ -56,3 +56,15 @@ sudo sh /volume1/docker/immich-google-sync/deploy/update-synology.sh vX.Y.Z
 ```
 
 Skrypt wymaga istniejącego wolumenu `/volume1/docker/immich-google-sync/data`, portu 8787 i polityki restartu `unless-stopped`. Zachowany poprzedni kontener ma nazwę `immich-google-sync-before-update-<timestamp>`. Publikacja w GitHub nie uruchamia aktualizacji na NAS. Kontrola HTTP potwierdza start aplikacji, nie gwarantuje powodzenia kolejnego transferu do Google Photos.
+
+## Automatyczne sprawdzanie aktualizacji (co 30 minut)
+
+Skrypt [`deploy/auto-update-synology.sh`](../deploy/auto-update-synology.sh) odczytuje wersję z publicznego pliku `VERSION` na gałęzi `main`. Jeśli wersja różni się od obrazu uruchomionego kontenera, wywołuje istniejący `update-synology.sh`. **Nie używa tagu `latest`** i nie zmienia aplikacji ani danych samodzielnie. Jeśli obraz nowej wersji nie został jeszcze opublikowany, aktualizator przerwie działanie przed zatrzymaniem produkcji.
+
+Jednorazowo umieść skrypt w `/volume1/docker/immich-google-sync/deploy/`, nadaj mu uprawnienia wykonywania i wykonaj test ręczny. Następnie w **DSM → Panel sterowania → Harmonogram zadań** utwórz *Zaplanowane zadanie → Skrypt zdefiniowany przez użytkownika*: użytkownik `root`, harmonogram co 30 minut, polecenie:
+
+```sh
+/bin/sh /volume1/docker/immich-google-sync/deploy/auto-update-synology.sh
+```
+
+Nie konfiguruj równocześnie drugiego zadania aktualizacji. Harmonogram DSM należy włączyć dopiero po poprawnym teście i upewnieniu się, że działająca wersja ma oczekiwany tag obrazu. Logi zadania można sprawdzać w Harmonogramie zadań. Zmiany w repozytorium nie instalują zadania DSM automatycznie.
