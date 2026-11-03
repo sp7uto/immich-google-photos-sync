@@ -2,7 +2,7 @@
 
 # 📷 Immich → Google Photos Sync
 
-![Official one-way app icon](app/static/icon.svg)
+<img src="app/static/icon.svg" alt="Immich → Google Photos" width="96" height="96">
 
 ### Your photos. Your selection. Your approval.
 
