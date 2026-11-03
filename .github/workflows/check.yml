@@ -107,10 +107,11 @@ jobs:
           payload = json.dumps({"ids": ["no-real-asset"]}).encode()
           status, _, _ = request("/api/send", payload, {"Content-Type": "application/json"})
           assert status == 403, f"Expected CSRF guard, got {status}"
-          status, _, _ = request("/api/send", payload, {
+          # Invalid empty queue must fail before any external Immich/Google calls.
+          status, _, _ = request("/api/send", json.dumps({"ids": []}).encode(), {
               "Content-Type": "application/json", "X-Requested-With": "XMLHttpRequest"
           })
-          assert status == 409, f"Expected missing album guard, got {status}"
+          assert status == 400, f"Expected empty queue guard, got {status}"
           status, body, _ = request("/api/status")
           assert status == 200 and json.loads(body)["running"] is False
           print("Real container HTTP smoke checks passed; no external requests or uploads")
