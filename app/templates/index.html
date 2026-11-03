@@ -11,7 +11,7 @@ button,a.btn{border:0;border-radius:8px;padding:10px 14px;background:#eee;color:
 pre{background:#080808;padding:12px;border-radius:10px;height:180px;overflow:auto;white-space:pre-wrap}
 small{color:#aaa}
 </style></head><body><div class="wrap">
-<h1>Immich → Google Photos <small>v{{version}} · Manual Select</small></h1>
+<h1>Immich → Google Photos <img src="/static/icon.svg" alt="Immich → Google Photos" width="34" height="34" style="vertical-align:middle;margin:0 8px;border-radius:7px"> <small>v{{version}} · Manual Select</small></h1>
 <div class="cards"><div class="card">W albumie<div class="big" id="total">–</div></div><div class="card">Nowe<div class="big" id="new">–</div></div><div class="card">Wysłane<div class="big" id="sent">–</div></div></div>
 <details id="reviewPanel"><summary>Archiwum spraw do weryfikacji: <strong id="review">–</strong> (nie są ponownie wysyłane)</summary><div id="reviewGrid" class="grid"></div></details>
 <div class="toolbar"><button onclick="load()">Odśwież podgląd</button><button onclick="selectNew()">Zaznacz nowe</button><button onclick="clearSel()">Odznacz</button><button class="primary" onclick="send()">WYŚLIJ ZAZNACZONE</button><button onclick="ctrl('pause')">Pauza</button><button onclick="ctrl('resume')">Wznów</button><button onclick="ctrl('cancel')">Anuluj</button><a class="btn" href="/api/history.csv">Historia CSV</a><a class="btn" href="/api/review.csv">Do weryfikacji CSV</a><a class="btn" href="/api/review-audit.csv">Decyzje CSV</a><button onclick="backup()">Backup bazy</button><button onclick="clearSession()">Wyczyść widok sesji</button></div>
