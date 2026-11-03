@@ -234,6 +234,24 @@ def create_google_album():
             return jsonify({"error":"Album creation was not confirmed locally. Check Google Photos before trying again."}),502
     return jsonify({"ok":True,"album_id":album_id,"name":name})
 
+def verify_destination_album(album_id):
+    """Check destination before uploading any bytes to avoid orphaned media."""
+    if not album_id:
+        raise RuntimeError("Google Photos destination album is not configured")
+    cred=google_credentials()
+    response=requests.get(
+        "https://photoslibrary.googleapis.com/v1/albums/"+album_id,
+        headers={"Authorization":f"Bearer {cred.token}"},
+        timeout=20)
+    if response.status_code==404:
+        raise RuntimeError("Google Photos destination album was not found (HTTP 404); no files uploaded. Verify the configured album ID.")
+    if not response.ok:
+        raise RuntimeError(f"Google Photos album preflight HTTP {response.status_code}; no files uploaded")
+    data=response.json()
+    if data.get("id")!=album_id:
+        raise RuntimeError("Google Photos returned a different destination album ID; no files uploaded")
+
+
 def google_upload(asset, album, album_id):
     if not album_id:
         raise RuntimeError("Google destination album is not configured")
@@ -290,6 +308,8 @@ def _run_worker(ids):
     album_id=c.get("google_album_id")
     if not album_id:
         raise RuntimeError("Configure the destination Google Photos album before sending")
+    # Verify destination before any file is marked uploading or sent.
+    verify_destination_album(album_id)
     aset={a["id"]:a for a in source_assets()}
     already_sent=sent_ids()
     queue=[aset[i] for i in dict.fromkeys(ids) if i in aset and ext_ok(aset[i],c) and i not in already_sent]
