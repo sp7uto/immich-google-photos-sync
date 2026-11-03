@@ -1,5 +1,12 @@
 # Changelog
 
+## v3.1.5 — Branded one-way icon in the panel
+
+- Replace generic photo pictogram with a five-petal Immich-style mark next to the Google Photos pinwheel, connected by one directional arrow.
+- Display the app icon directly in the panel heading as well as the browser favicon and documentation.
+- No changes to upload, authentication, queue or database behavior.
+
+
 ## v3.1.4 — Official one-way icon
 
 - Add official one-way Immich → Google Photos favicon and icon.
