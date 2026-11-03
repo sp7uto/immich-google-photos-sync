@@ -2,11 +2,13 @@
 
 # 📷 Immich → Google Photos Sync
 
+![Official one-way app icon](app/static/icon.svg)
+
 ### Your photos. Your selection. Your approval.
 
 **Self-hosted, manual-first photo transfer from Immich to Google Photos.**
 
-![Version](https://img.shields.io/badge/version-3.1--dev-blue) ![Docker](https://img.shields.io/badge/Docker-supported-2496ED?logo=docker&logoColor=white) ![Mode](https://img.shields.io/badge/selection-manual-orange)
+![Version](https://img.shields.io/badge/version-3.1.4-blue) ![Docker](https://img.shields.io/badge/Docker-supported-2496ED?logo=docker&logoColor=white) ![Mode](https://img.shields.io/badge/selection-manual-orange)
 
 **[English](README.md) · [Polski](docs/README.pl.md) · [Installation](docs/INSTALLATION.md) · [OAuth](docs/GOOGLE-OAUTH.md) · [Security](SECURITY.md)**
 
@@ -51,13 +53,13 @@ The default Compose file binds the panel to **127.0.0.1 only**. Open `http://loc
 
 1. Create an Immich album named `do publikacji`.
 2. Add photos you intend to export.
-3. In the panel, explicitly create the destination Google Photos album `do publikacji` (check first that no duplicate album exists). Review thumbnails.
+3. Review the photos from the Immich album in the panel. Google Photos uploads go to the **library**, not automatically to a specific album.
 4. Check the files and press **Send selected**.
 5. Follow progress and export history if needed.
 
 ## Current limitations
 
-- The intended Google Photos album is `do publikacji`. The panel can explicitly create a new app-owned album, then uploads use its saved album ID. Until that setup is completed, the transfer queue refuses to start.
+- Google Photos uploads go to the library; **no automatic Google Photos album assignment**. The existing album-creation API is not part of the upload workflow.
 - OAuth token must be generated separately; no OAuth login screen.
 - Optional HTTP Basic authentication via `PANEL_PASSWORD` (protects panel and API). No built-in HTTPS; never expose port 8787 publicly.
 - Asset search paginates beyond 1,000 items; verify behavior against your Immich version.
@@ -75,4 +77,4 @@ The default Compose file binds the panel to **127.0.0.1 only**. Open `http://loc
 - [Changelog](CHANGELOG.md)
 - [Synology deployment, incident handling and release workflow (PL)](docs/SYNOLOGY-PL.md)
 
-**Release status:** Development version. Real transfers have succeeded on a private Synology installation, but a Google Photos `mediaItems:batchCreate` HTTP 404 has also occurred and requires investigation. Changes on review branches are not deployed automatically. The private Synology deployment is separate from GitHub. Not affiliated with Immich or Google.
+**Release status:** v3.1.4 adds the official one-way icon only; upload behavior is unchanged from v3.1.3, whose library upload was confirmed on a private Synology installation on 2026-11-03. Deployment to Synology is **manual**, via `deploy/update-synology.sh vX.Y.Z`; publishing on GitHub does not update the running container automatically. Not affiliated with Immich or Google.
