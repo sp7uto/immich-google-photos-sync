@@ -2,7 +2,7 @@
 
 ![Oficjalna ikona transferu jednokierunkowego](../app/static/icon.svg)
 
-**Wersja 3.1.4: ręczny wybór, świadome zatwierdzenie, oficjalna ikona.**
+**Wersja 3.1.5: ręczny wybór, świadome zatwierdzenie, oficjalna ikona.**
 
 Aplikacja uruchamiana w Dockerze pozwala wybrać zdjęcia z albumu Immich i przesłać je do biblioteki Google Photos. Nie jest to automatyczna, dwukierunkowa synchronizacja.
 
@@ -28,4 +28,4 @@ Zobacz [instrukcję instalacji](INSTALLATION.md) oraz [OAuth](GOOGLE-OAUTH.md).
 
 ## Aktualizacje Synology
 
-Publikacja nowej wersji w GitHub **nie aktualizuje automatycznie** działającego kontenera. Aktualizacja jest uruchamiana świadomie poleceniem `sudo sh /volume1/docker/immich-google-sync/deploy/update-synology.sh v3.1.4`. Skrypt wykonuje kopię SQLite i zachowuje poprzedni kontener do wycofania aktualizacji.
+Publikacja nowej wersji w GitHub **nie aktualizuje automatycznie** działającego kontenera. Aktualizacja jest uruchamiana świadomie poleceniem `sudo sh /volume1/docker/immich-google-sync/deploy/update-synology.sh v3.1.5`. Skrypt wykonuje kopię SQLite i zachowuje poprzedni kontener do wycofania aktualizacji.
