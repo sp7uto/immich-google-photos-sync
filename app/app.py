@@ -259,7 +259,8 @@ def google_upload(asset, album, album_id):
     body={"albumId":album_id,"newMediaItems":[{"description":"Uploaded from Immich","simpleMediaItem":{"uploadToken":token}}]}
     cr=requests.post("https://photoslibrary.googleapis.com/v1/mediaItems:batchCreate",
                      headers={"Authorization":f"Bearer {cred.token}","Content-Type":"application/json"},
-                     json=body,timeout=60); if not cr.ok:
+                     json=body,timeout=60)
+    if not cr.ok:
         # Do not log OAuth headers or upload tokens; response body is diagnostic only.
         detail=cr.text[:1200].replace("\\n"," ")
         raise RuntimeError(f"Google Photos batchCreate HTTP {cr.status_code}: {detail}")
