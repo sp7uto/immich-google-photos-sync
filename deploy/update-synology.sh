@@ -65,7 +65,7 @@ if docker run -d --name "$NAME" --restart unless-stopped \
     --network "$NETWORK" --env-file "$SAVE/container.env" \
     -p 8787:8787 -v "$BASE/data:/data" "$TARGET"; then
   sleep 3
-  if docker exec "$NAME" python3 -c 'import urllib.request; urllib.request.urlopen("http://127.0.0.1:8787/api/test",timeout=10)' >/dev/null 2>&1; then
+  if docker exec "$NAME" python3 -c 'import os,urllib.request,base64; r=urllib.request.Request("http://127.0.0.1:8787/api/status"); p=os.getenv("PANEL_PASSWORD"); r.add_header("Authorization","Basic "+base64.b64encode(("health:"+p).encode()).decode()) if p else None; assert urllib.request.urlopen(r,timeout=10).status==200' >/dev/null 2>&1; then
     echo "SUCCESS: $VERSION is running. Previous container: $OLD"
     echo "Backup: $SAVE"
     exit 0
