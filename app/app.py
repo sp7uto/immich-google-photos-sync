@@ -4,7 +4,7 @@ from pathlib import Path
 from flask import Flask, render_template, jsonify, request, Response
 import requests
 
-APP_VERSION="3.1.5"
+APP_VERSION="3.1.6"
 DATA=Path("/data"); DATA.mkdir(exist_ok=True)
 DB=DATA/"state.db"
 CFG=DATA/"config.json"
