@@ -1,8 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Immich to Google Photos, one-way transfer">
-<defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#12375d"/><stop offset="1" stop-color="#041025"/></linearGradient><linearGradient id="photo" x2="0.8" y2="1"><stop stop-color="#00b8fa"/><stop offset="1" stop-color="#1165c8"/></linearGradient><linearGradient id="arrow" x2="0" y2="1"><stop stop-color="#fff"/><stop offset="1" stop-color="#9bcaf4"/></linearGradient></defs>
-<rect x="3" y="3" width="250" height="250" rx="46" fill="url(#bg)" stroke="#24577b" stroke-width="3"/>
-<path d="M62 77 C90 30 163 33 184 66 L197 55 L205 93 L168 88 L180 77 C158 52 112 49 83 82 Z" fill="url(#arrow)"/>
-<rect x="19" y="98" width="107" height="91" rx="15" fill="#f5faff"/><rect x="25" y="104" width="95" height="79" rx="11" fill="url(#photo)"/>
-<circle cx="94" cy="124" r="11" fill="#fff"/><path d="M27 166 L59 130 L83 154 L94 144 L119 169 L119 177 L27 177 Z" fill="#e8f6ff"/>
-<g transform="translate(178 146)"><path d="M0 0 V-47 C29-47 29-10 0 0Z" fill="#ea4335"/><path d="M0 0 H47 C47 29 10 29 0 0Z" fill="#4285f4"/><path d="M0 0 V47 C-29 47-29 10 0 0Z" fill="#0fce68"/><path d="M0 0 H-47 C-47-29-10-29 0 0Z" fill="#fbbc04"/></g>
-</svg>
+<defs><radialGradient id="bg"><stop stop-color="#102b53"/><stop offset="1" stop-color="#031127"/></radialGradient><linearGradient id="a" x1="0" x2="1" y1="1" y2="0"><stop stop-color="#8dc4ff"/><stop offset=".65" stop-color="#fff"/></linearGradient></defs>
+<rect x="2" y="2" width="252" height="252" rx="49" fill="url(#bg)" stroke="#245279" stroke-width="3"/>
+<path d="M66 87 Q121 23 172 66 L180 52 L198 95 L151 90 L166 77 Q121 46 83 96 Z" fill="url(#a)"/>
+<g transform="translate(67 145)" stroke="#fff" stroke-width="3.5" stroke-linejoin="round">
+<path d="M0 0 C-27-35-13-60 0-60 C20-60 23-28 0 0" fill="#f84b52"/>
+<path d="M0 0 C18-40 53-30 53-10 C53 10 26 14 0 0" fill="#ffcf00"/>
+<path d="M0 0 C43 7 36 44 15 48 C-5 49-13 23 0 0" fill="#1575fa"/>
+<path d="M0 0 C-14 42-48 33-48 12 C-48-8-25-16 0 0" fill="#00c875"/>
+<path d="M0 0 C-43-11-34-45-14-48 C6-51 17-24 0 0" fill="#895ff6"/>
+</g>
+<g transform="translate(184 147)">
+<path d="M0 0 V-43 C28-43 28-10 0 0Z" fill="#ea4335"/>
+<path d="M0 0 H43 C43 28 10 28 0 0Z" fill="#4285f4"/>
+<path d="M0 0 V43 C-28 43-28 10 0 0Z" fill="#0fce68"/>
+<path d="M0 0 H-43 C-43-28-10-28 0 0Z" fill="#fbbc04"/>
+</g></svg>
