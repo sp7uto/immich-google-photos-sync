@@ -4,7 +4,7 @@ from pathlib import Path
 from flask import Flask, render_template, jsonify, request, Response
 import requests
 
-APP_VERSION="3.1.2"
+APP_VERSION="3.1.3"
 DATA=Path("/data"); DATA.mkdir(exist_ok=True)
 DB=DATA/"state.db"
 CFG=DATA/"config.json"
@@ -234,9 +234,7 @@ def create_google_album():
             return jsonify({"error":"Album creation was not confirmed locally. Check Google Photos before trying again."}),502
     return jsonify({"ok":True,"album_id":album_id,"name":name})
 
-def google_upload(asset, album, album_id):
-    if not album_id:
-        raise RuntimeError("Google destination album is not configured")
+def google_upload(asset, album, album_id=None):
     cred=google_credentials()
     h={"Authorization":f"Bearer {cred.token}","Content-Type":"application/octet-stream",
        "X-Goog-Upload-Protocol":"raw","X-Goog-Upload-File-Name":asset.get("originalFileName","photo")}
@@ -256,7 +254,7 @@ def google_upload(asset, album, album_id):
     token=up.text.strip()
     if not token:
         raise RuntimeError("Google Photos returned an empty upload token")
-    body={"albumId":album_id,"newMediaItems":[{"description":"Uploaded from Immich","simpleMediaItem":{"uploadToken":token}}]}
+    body={"newMediaItems":[{"description":"Uploaded from Immich","simpleMediaItem":{"uploadToken":token}}]}
     cr=requests.post("https://photoslibrary.googleapis.com/v1/mediaItems:batchCreate",
                      headers={"Authorization":f"Bearer {cred.token}","Content-Type":"application/json"},
                      json=body,timeout=60)
@@ -287,9 +285,6 @@ def worker(ids):
 
 def _run_worker(ids):
     c=cfg()
-    album_id=c.get("google_album_id")
-    if not album_id:
-        raise RuntimeError("Configure the destination Google Photos album before sending")
     aset={a["id"]:a for a in source_assets()}
     already_sent=sent_ids()
     queue=[aset[i] for i in dict.fromkeys(ids) if i in aset and ext_ok(aset[i],c) and i not in already_sent]
@@ -305,7 +300,7 @@ def _run_worker(ids):
                 # Persist before contacting Google: interrupted uploads require manual review.
                 con.execute("INSERT OR REPLACE INTO sent(asset_id,filename,sent_at,google_album,status,error) VALUES(?,?,?,?,'uploading','')",
                             (a["id"],a.get("originalFileName",""),int(time.time()),c["google_album"])); con.commit()
-                mid=google_upload(a,c["google_album"],album_id)
+                mid=google_upload(a,c["google_album"])
                 con.execute("INSERT OR REPLACE INTO sent(asset_id,filename,sent_at,google_album,media_item_id,status,error) VALUES(?,?,?,?,?,'sent','')",
                             (a["id"],a.get("originalFileName",""),int(time.time()),c["google_album"],mid)); con.commit()
                 log("OK  "+a.get("originalFileName",""))
@@ -344,8 +339,6 @@ def send():
     ids=payload.get("ids",[])
     if not isinstance(ids,list) or not ids or not all(isinstance(i,str) and i.strip() for i in ids):
         return jsonify({"error":"Nieprawidłowa lista identyfikatorów"}),400
-    if not cfg().get("google_album_id"):
-        return jsonify({"error":"Najpierw skonfiguruj album docelowy Google Photos"}),409
     with lock:
         if state["running"]: return jsonify({"error":"Synchronizacja już trwa"}),409
         state.update(running=True,paused=False,cancel=False,done=0,total=0,current="")
