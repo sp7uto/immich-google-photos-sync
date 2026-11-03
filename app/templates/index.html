@@ -14,11 +14,11 @@ small{color:#aaa}
 <h1>Immich → Google Photos <small>v{{version}} · Manual Select</small></h1>
 <div class="cards"><div class="card">W albumie<div class="big" id="total">–</div></div><div class="card">Nowe<div class="big" id="new">–</div></div><div class="card">Wysłane<div class="big" id="sent">–</div></div></div>
 <div class="cards"><div class="card">Do weryfikacji<div class="big" id="review">–</div></div></div>
-<div class="toolbar"><button onclick="createAlbum()">Utwórz album Google Photos</button><button onclick="load()">Odśwież podgląd</button><button onclick="selectNew()">Zaznacz nowe</button><button onclick="clearSel()">Odznacz</button><button class="primary" onclick="send()">WYŚLIJ ZAZNACZONE</button><button onclick="ctrl('pause')">Pauza</button><button onclick="ctrl('resume')">Wznów</button><button onclick="ctrl('cancel')">Anuluj</button><a class="btn" href="/api/history.csv">Historia CSV</a><a class="btn" href="/api/review.csv">Do weryfikacji CSV</a><a class="btn" href="/api/review-audit.csv">Decyzje CSV</a><button onclick="backup()">Backup bazy</button></div>
+<div class="toolbar"><button onclick="createAlbum()">Utwórz album Google Photos</button><button onclick="load()">Odśwież podgląd</button><button onclick="selectNew()">Zaznacz nowe</button><button onclick="clearSel()">Odznacz</button><button class="primary" onclick="send()">WYŚLIJ ZAZNACZONE</button><button onclick="ctrl('pause')">Pauza</button><button onclick="ctrl('resume')">Wznów</button><button onclick="ctrl('cancel')">Anuluj</button><a class="btn" href="/api/history.csv">Historia CSV</a><a class="btn" href="/api/review.csv">Do weryfikacji CSV</a><a class="btn" href="/api/review-audit.csv">Decyzje CSV</a><button onclick="backup()">Backup bazy</button><button onclick="clearSession()">Wyczyść widok sesji</button></div>
 <progress id="prog" value="0" max="1"></progress><div id="cur"><small>Gotowy.</small></div>
 <div id="albumState"><small>Sprawdzanie albumu docelowego…</small></div>
 <h3>Podgląd przed wysłaniem</h3><div id="grid" class="grid"></div>
-<h3>Log na żywo</h3><pre id="log"></pre>
+<h3>Log ostatniej operacji (pamięć sesji)</h3><pre id="log"></pre>
 </div><script>
 let items=[];
 function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -55,6 +55,7 @@ if(!confirm(`Wysłać ${ids.length} wybranych plików do Google Photos?`))return
 let r=await fetch('/api/send',{method:'POST',headers:{'Content-Type':'application/json','X-Requested-With':'XMLHttpRequest'},body:JSON.stringify({ids})});if(!r.ok)alert(await r.text())}
 async function ctrl(c){let r=await fetch('/api/control/'+c,{method:'POST',headers:{'X-Requested-With':'XMLHttpRequest'}});if(!r.ok)alert(await r.text())}
 async function backup(){let r=await fetch('/api/backup',{method:'POST',headers:{'X-Requested-With':'XMLHttpRequest'}});let j=await r.json();alert(r.ok&&j.ok?'Backup zapisany jako /data/state-backup.db':(j.error||'Błąd'))}
-async function poll(){let s=await (await fetch('/api/status')).json();prog.max=Math.max(s.total,1);prog.value=s.done;cur.textContent=`${s.running?'Praca':'Gotowy'} · ${s.done}/${s.total} ${s.paused?'· PAUZA':''} ${s.current?'· '+s.current:''}`;log.textContent=s.logs.join('\n');log.scrollTop=log.scrollHeight;if(!s.running&&window.wasRunning)load();window.wasRunning=s.running}
+async function clearSession(){if(!confirm("Wyczyścić licznik i log sesji? Historia zdjęć pozostanie bez zmian."))return;let r=await fetch("/api/session/clear",{method:"POST",headers:{"X-Requested-With":"XMLHttpRequest"}});let j=await r.json();if(!r.ok)return alert(j.error||"Błąd");await poll();await load()}
+async function poll(){let s=await (await fetch('/api/status')).json();prog.max=Math.max(s.total,1);prog.value=s.done;cur.textContent=s.running?`Praca · ${s.done}/${s.total} ${s.paused?"· PAUZA":""} ${s.current?"· "+s.current:""}`:"Gotowy (brak aktywnej kolejki)";log.textContent=s.logs.join('\n');log.scrollTop=log.scrollHeight;if(!s.running&&window.wasRunning)load();window.wasRunning=s.running}
 load();setInterval(poll,1000);
 </script></body></html>
