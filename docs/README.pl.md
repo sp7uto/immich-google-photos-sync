@@ -2,8 +2,6 @@
 
 <img src="../app/static/icon.svg" alt="Immich → Google Photos" width="96" height="96">
 
-**Ręczny wybór, świadome zatwierdzenie i ikona niezależna od wersji.**
-
 Aplikacja uruchamiana w Dockerze pozwala wybrać zdjęcia z albumu Immich i przesłać je do biblioteki Google Photos. Nie jest to automatyczna, dwukierunkowa synchronizacja.
 
 ## Jak to działa
@@ -22,10 +20,10 @@ Program przechowuje historię wysyłek w lokalnej bazie SQLite. Umożliwia wstrz
 - Token OAuth trzeba uzyskać osobnym skryptem.
 - Panel obsługuje opcjonalne hasło `PANEL_PASSWORD`, lecz nie zapewnia własnego HTTPS — **nie udostępniaj go publicznie**.
 - Nie usuwa zdjęć z Immich.
-- Obsługa dużych albumów, wideo i RAW wymaga dodatkowych testów.
+- Wyszukiwanie zdjęć obsługuje stronicowanie; wideo jest domyślnie wyłączone, a formaty RAW wymagają dodatkowych testów.
 
 Zobacz [instrukcję instalacji](INSTALLATION.md) oraz [OAuth](GOOGLE-OAUTH.md).
 
 ## Aktualizacje Synology
 
-Publikacja nowej wersji w GitHub **nie aktualizuje automatycznie** działającego kontenera. Aktualizacja jest uruchamiana świadomie poleceniem `sudo sh /volume1/docker/immich-google-sync/deploy/update-synology.sh v3.1.6`. Skrypt wykonuje kopię SQLite i zachowuje poprzedni kontener do wycofania aktualizacji.
+Publikacja nowej wersji w GitHub **nie aktualizuje automatycznie** działającego kontenera. Aktualizacja jest uruchamiana świadomie poleceniem `sudo sh /volume1/docker/immich-google-sync/deploy/update-synology.sh vX.Y.Z`, gdzie `vX.Y.Z` należy zastąpić numerem opublikowanego wydania. Skrypt wykonuje kopię SQLite i zachowuje poprzedni kontener do wycofania aktualizacji.
