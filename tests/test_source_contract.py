@@ -185,28 +185,14 @@ class SourceContractTests(unittest.TestCase):
         example=(ROOT / ".env.example").read_text(encoding="utf-8")
         self.assertIn("SOURCE_ALBUM=do publikacji", example)
 
-    def test_google_album_is_explicit_and_required(self):
-        self.assertIn('@app.post("/api/google-album/create")', self.source)
-        self.assertIn('payload.get("confirmation")!=f"CREATE:{name}"', self.source)
-        self.assertIn('"albumId":album_id', self.source)
-        self.assertIn('album_id=c.get("google_album_id")', self.source)
-        self.assertIn('if not album_id:', self.source)
-        self.assertIn('settings["google_album_id"]=album_id', self.source)
-        self.assertIn('Cannot rename a configured destination album', self.source)
-        self.assertIn('onclick="createAlbum()"', self.html)
-
-    def test_destination_preflight_and_visible_state(self):
-        self.assertIn('Najpierw skonfiguruj album docelowy Google Photos', self.source)
-        self.assertIn('if not cfg().get("google_album_id"):', self.source)
+    def test_restored_library_upload_without_album_id(self):
+        self.assertIn('body={"newMediaItems":', self.source)
+        self.assertNotIn('"albumId":album_id,"newMediaItems"', self.source)
+        self.assertNotIn('if not cfg().get("google_album_id"):', self.source)
+        self.assertIn('mid=google_upload(a,c["google_album"])', self.source)
         self.assertIn('id="albumState"', self.html)
-        self.assertIn("j.config.google_album_id", self.html)
-        self.assertIn("if(result.ok)await load()", self.html)
-
-    def test_queue_pins_destination_album(self):
-        self.assertIn('def google_upload(asset, album, album_id):', self.source)
-        self.assertIn('album_id=c.get("google_album_id")', self.source)
-        self.assertIn('mid=google_upload(a,c["google_album"],album_id)', self.source)
-        self.assertNotIn('album_id=cfg().get("google_album_id")', self.source)
+        self.assertIn('Cel: biblioteka Google Photos', self.html)
+        self.assertNotIn('onclick="createAlbum()"', self.html)
 
     def test_secrets_not_hardcoded(self):
         self.assertIn('os.getenv("IMMICH_API_KEY"', self.source)
