@@ -263,7 +263,7 @@ def google_upload(asset, album, album_id):
     if not cr.ok:
         # Do not log OAuth headers or upload tokens; response body is diagnostic only.
         detail=cr.text[:1200].replace("\\n"," ")
-        raise RuntimeError(f"Google Photos batchCreate HTTP {cr.status_code}: {detail}")
+        raise RuntimeError(f"Google Photos batchCreate HTTP {cr.status_code}: {detail}. Upload may already exist in Google Photos; do not retry automatically. If HTTP 404, verify that the destination album was created by this OAuth application.")
     results=cr.json().get("newMediaItemResults",[])
     if len(results)!=1:
         raise RuntimeError("Google Photos returned an unexpected number of media results")
