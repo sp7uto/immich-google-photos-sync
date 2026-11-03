@@ -1,6 +1,6 @@
 # Immich → Google Photos Sync — dokumentacja polska
 
-![Oficjalna ikona transferu jednokierunkowego](../app/static/icon.svg)
+<img src="../app/static/icon.svg" alt="Immich → Google Photos" width="96" height="96">
 
 **Ręczny wybór, świadome zatwierdzenie i ikona niezależna od wersji.**
 
