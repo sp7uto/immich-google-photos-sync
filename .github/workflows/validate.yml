@@ -1,0 +1,43 @@
+name: Validate application
+
+on:
+  push:
+    branches: [main, 'fix/**']
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install application dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Check Python syntax and updater shell
+        run: |
+          python -m compileall -q app
+          sh -n deploy/update-synology.sh
+      - name: Build Docker image
+        run: docker build -t immich-google-sync:ci .
+      - name: Exercise session state API without Google or Immich
+        run: |
+          docker run --rm --entrypoint python immich-google-sync:ci -c '
+          import app as module
+          client=module.app.test_client()
+          assert client.get("/api/status").status_code == 200
+          with module.lock:
+              module.state.update(running=False,done=1,total=1,logs=["old transfer"])
+          assert client.post("/api/session/clear").status_code == 403
+          assert client.post("/api/session/clear",headers={"X-Requested-With":"XMLHttpRequest"}).status_code == 200
+          data=client.get("/api/status").json
+          assert data["done"] == 0 and data["total"] == 0 and data["logs"] == []
+          with module.lock:
+              module.state["running"]=True
+          assert client.post("/api/session/clear",headers={"X-Requested-With":"XMLHttpRequest"}).status_code == 409
+          print("Session API checks passed")
+          '

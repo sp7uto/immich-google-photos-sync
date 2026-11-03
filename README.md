@@ -6,7 +6,7 @@
 
 **Self-hosted, manual-first photo transfer from Immich to Google Photos.**
 
-![Version](https://img.shields.io/badge/version-3.0-blue) ![Docker](https://img.shields.io/badge/Docker-supported-2496ED?logo=docker&logoColor=white) ![Mode](https://img.shields.io/badge/selection-manual-orange)
+![Version](https://img.shields.io/badge/version-3.1--dev-blue) ![Docker](https://img.shields.io/badge/Docker-supported-2496ED?logo=docker&logoColor=white) ![Mode](https://img.shields.io/badge/selection-manual-orange)
 
 **[English](README.md) · [Polski](docs/README.pl.md) · [Installation](docs/INSTALLATION.md) · [OAuth](docs/GOOGLE-OAUTH.md) · [Security](SECURITY.md)**
 
@@ -55,12 +55,12 @@ The default Compose file binds the panel to **127.0.0.1 only**. Open `http://loc
 4. Check the files and press **Send selected**.
 5. Follow progress and export history if needed.
 
-## Limitations of v3.0
+## Current limitations
 
 - The intended Google Photos album is `do publikacji`. The panel can explicitly create a new app-owned album, then uploads use its saved album ID. Until that setup is completed, the transfer queue refuses to start.
 - OAuth token must be generated separately; no OAuth login screen.
 - Optional HTTP Basic authentication via `PANEL_PASSWORD` (protects panel and API). No built-in HTTPS; never expose port 8787 publicly.
-- Asset search uses a single page (up to 1,000 items).
+- Asset search paginates beyond 1,000 items; verify behavior against your Immich version.
 - SQLite state is local; this is not bidirectional sync.
 - Videos are disabled by default; RAW formats need testing.
 - Files are **not deleted from Immich**.
@@ -73,5 +73,6 @@ The default Compose file binds the panel to **127.0.0.1 only**. Open `http://loc
 - [Polska dokumentacja](docs/README.pl.md)
 - [Security](SECURITY.md)
 - [Changelog](CHANGELOG.md)
+- [Synology deployment, incident handling and release workflow (PL)](docs/SYNOLOGY-PL.md)
 
-**Release status:** Public development snapshot; automated GitHub Actions checks have been reported passing for an earlier revision, but the current commit and real Google Photos transfers have not been independently verified. Verify Google Photos API compatibility and authorization before relying on it for transfers. The private Synology deployment is a separate, previously configured instance. Not affiliated with Immich or Google.
+**Release status:** Development version. Real transfers have succeeded on a private Synology installation, but a Google Photos `mediaItems:batchCreate` HTTP 404 has also occurred and requires investigation. Changes on review branches are not deployed automatically. The private Synology deployment is separate from GitHub. Not affiliated with Immich or Google.

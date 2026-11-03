@@ -4,7 +4,7 @@ from pathlib import Path
 from flask import Flask, render_template, jsonify, request, Response
 import requests
 
-APP_VERSION="3.0"
+APP_VERSION="3.1-dev"
 DATA=Path("/data"); DATA.mkdir(exist_ok=True)
 DB=DATA/"state.db"
 CFG=DATA/"config.json"
@@ -259,7 +259,11 @@ def google_upload(asset, album, album_id):
     body={"albumId":album_id,"newMediaItems":[{"description":"Uploaded from Immich","simpleMediaItem":{"uploadToken":token}}]}
     cr=requests.post("https://photoslibrary.googleapis.com/v1/mediaItems:batchCreate",
                      headers={"Authorization":f"Bearer {cred.token}","Content-Type":"application/json"},
-                     json=body,timeout=60); cr.raise_for_status()
+                     json=body,timeout=60)
+    if not cr.ok:
+        # Do not log OAuth headers or upload tokens; response body is diagnostic only.
+        detail=cr.text[:1200].replace("\\n"," ")
+        raise RuntimeError(f"Google Photos batchCreate HTTP {cr.status_code}: {detail}")
     results=cr.json().get("newMediaItemResults",[])
     if len(results)!=1:
         raise RuntimeError("Google Photos returned an unexpected number of media results")
@@ -368,6 +372,17 @@ def control(cmd):
             state["cancel"]=True
             state["paused"]=False
     return jsonify({"ok":True})
+
+@app.post("/api/session/clear")
+def clear_session():
+    if request.headers.get("X-Requested-With")!="XMLHttpRequest":
+        return jsonify({"error":"Missing panel request header"}),403
+    with lock:
+        if state["running"]:
+            return jsonify({"error":"Cannot clear an active session"}),409
+        state.update(paused=False,cancel=False,current="",done=0,total=0,logs=[])
+    return jsonify({"ok":True})
+
 
 @app.get("/api/status")
 def status():
