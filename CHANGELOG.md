@@ -1,5 +1,12 @@
 # Changelog
 
+## v3.1.6 — Clean, version-independent branding
+
+- Refine the SVG icon to remove the visible petal artifacts and retain one forward arrow.
+- Keep version numbers out of the image; panel version is rendered dynamically, and the README release badge follows GitHub releases.
+- No transfer or database changes.
+
+
 ## v3.1.5 — Branded one-way icon in the panel
 
 - Replace generic photo pictogram with a five-petal Immich-style mark next to the Google Photos pinwheel, connected by one directional arrow.

@@ -8,7 +8,7 @@
 
 **Self-hosted, manual-first photo transfer from Immich to Google Photos.**
 
-![Version](https://img.shields.io/badge/version-3.1.5-blue) ![Docker](https://img.shields.io/badge/Docker-supported-2496ED?logo=docker&logoColor=white) ![Mode](https://img.shields.io/badge/selection-manual-orange)
+![Version](https://img.shields.io/github/v/release/sp7uto/immich-google-photos-sync) ![Docker](https://img.shields.io/badge/Docker-supported-2496ED?logo=docker&logoColor=white) ![Mode](https://img.shields.io/badge/selection-manual-orange)
 
 **[English](README.md) · [Polski](docs/README.pl.md) · [Installation](docs/INSTALLATION.md) · [OAuth](docs/GOOGLE-OAUTH.md) · [Security](SECURITY.md)**
 
@@ -77,4 +77,4 @@ The default Compose file binds the panel to **127.0.0.1 only**. Open `http://loc
 - [Changelog](CHANGELOG.md)
 - [Synology deployment, incident handling and release workflow (PL)](docs/SYNOLOGY-PL.md)
 
-**Release status:** v3.1.5 replaces the generic source pictogram with an Immich-style flower and displays the icon in the panel heading; upload behavior is unchanged from v3.1.3, whose library upload was confirmed on a private Synology installation on 2026-11-03. Deployment to Synology is **manual**, via `deploy/update-synology.sh vX.Y.Z`; publishing on GitHub does not update the running container automatically. Not affiliated with Immich or Google.
+**Release status:** The versionless branded icon is used as favicon and in the panel heading. v3.1.6 improves its clean vector rendering; upload behavior is unchanged from v3.1.3, whose library upload was confirmed on a private Synology installation on 2026-11-03. Deployment to Synology is **manual**, via `deploy/update-synology.sh vX.Y.Z`; publishing on GitHub does not update the running container automatically. Not affiliated with Immich or Google.
