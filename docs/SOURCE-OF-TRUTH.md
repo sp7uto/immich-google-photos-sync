@@ -1,24 +1,20 @@
 # Source of truth and release policy
 
-The **`main` branch of this GitHub repository** is the canonical public source tree.
+The `main` branch is the canonical public source. The current intended release version is in [`VERSION`](../VERSION); release images use the immutable version tag `ghcr.io/sp7uto/immich-google-photos-sync:vX.Y.Z`.
 
-An earlier locally distributed file named `immich-google-sync-github-ready.zip` was assembled before publication. Its contents **do not exactly match** the code committed to this repository and it is **superseded**. Do not mix files from that archive with files from `main`.
+The older local archive `immich-google-sync-github-ready.zip` predates publication and is superseded. Do not mix its contents with the current repository.
 
-For a reproducible public snapshot, use GitHub's **Code → Download ZIP** or a `git clone` of this repository. The resulting files are taken from the same revision as the README and CI configuration.
+## Source, release and deployment
 
-## Versioning
+- **GitHub main:** current source and documentation.
+- **GitHub Actions / GHCR:** build and publish versioned Docker images after validation.
+- **Synology DS1525+:** separate running installation; publishing code or an image does **not** update it.
+- **Manual update:** `sudo sh /volume1/docker/immich-google-sync/deploy/update-synology.sh vX.Y.Z`, with a real published version number. The script snapshots SQLite and retains the previous container for rollback.
 
-- `main`: public development snapshot, not yet validated as a production release.
-- `v3.0.0`: **not released**; do not create this tag until the release checklist passes.
-- Synology: existing private deployment remains separate and has not been modified or verified against the public tree.
+Version numbers are displayed by the application and are **not embedded in the icon**.
 
-## Before a release
+## Verified scope
 
-1. Record the exact Git commit SHA.
-2. Run automated syntax and secret-filename checks.
-3. Build and smoke-test the container from that SHA.
-4. Verify the real Immich and Google Photos flows with disposable test media.
-5. Inspect the public tree for secrets and personal data.
-6. Publish release notes with the verified SHA and limitations.
+On 2026-11-03 a selected photo was confirmed uploaded from Immich to the Google Photos **library** after the v3.1.3 fix. Later visual releases do not change upload logic. This is a confirmed transfer, not a blanket guarantee for every future upload or deployment.
 
-See [release checklist](RELEASE-CHECKLIST.md).
+For future releases, follow the [release verification checklist](RELEASE-CHECKLIST.md) and [Synology instructions](SYNOLOGY-PL.md).
