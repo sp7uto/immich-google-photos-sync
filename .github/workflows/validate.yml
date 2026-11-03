@@ -22,14 +22,12 @@ jobs:
         run: |
           python -m compileall -q app
           sh -n deploy/update-synology.sh
+      - name: Build Docker image
+        run: docker build -t immich-google-sync:ci .
       - name: Exercise session state API without Google or Immich
         run: |
-          python - <<'PY'
-          import importlib.util
-          from unittest.mock import patch
-          spec=importlib.util.spec_from_file_location("sync_app","app/app.py")
-          module=importlib.util.module_from_spec(spec)
-          spec.loader.exec_module(module)
+          docker run --rm --entrypoint python immich-google-sync:ci -c '
+          import app as module
           client=module.app.test_client()
           assert client.get("/api/status").status_code == 200
           with module.lock:
@@ -42,6 +40,4 @@ jobs:
               module.state["running"]=True
           assert client.post("/api/session/clear",headers={"X-Requested-With":"XMLHttpRequest"}).status_code == 409
           print("Session API checks passed")
-          PY
-      - name: Build Docker image
-        run: docker build -t immich-google-sync:ci .
+          '
