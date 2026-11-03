@@ -48,3 +48,17 @@ Panel produkcyjny: `http://192.168.1.225:8787` — dostęp tylko z zaufanej siec
 ## Google Photos API
 
 Od 31 marca 2025 r. Google ogranicza operacje odczytu do treści utworzonych przez aplikację. Zakres `photoslibrary.appendonly` wystarcza do tworzenia albumów i dodawania nowych zdjęć, ale nie do odczytywania albumów. Zobacz: https://developers.google.com/photos/support/updates
+
+## Aktualizator na Synology (przygotowany, jeszcze niewdrożony)
+
+Skrypt [`deploy/update-synology.sh`](../deploy/update-synology.sh) wykonuje **jednorazową aktualizację wskazanej wersji**: kontrola kontenera, blokada współbieżności, backup SQLite, zachowanie `docker inspect`, pobranie obrazu GHCR, uruchomienie z istniejącym `/data`, kontrola `/api/test`, przy błędzie przywrócenie poprzedniego kontenera. Nie nadpisuje bazy podczas rollbacku.
+
+Przykład **dopiero po opublikowaniu i przetestowaniu wydania**:
+
+```sh
+sudo sh deploy/update-synology.sh v3.1.0
+```
+
+Skrypt zakłada aktualny port 8787, istniejący wolumen i politykę restartu `unless-stopped`. W razie różnic kończy działanie bez wdrożenia. Nie jest jeszcze uruchamiany na NAS i nie ma timera. **Nie uruchamiać go z gałęzi roboczej ani przed testem odtwarzania.** Test HTTP `/api/test` jest testem uruchomienia, nie gwarantuje skutecznego przesyłania do Google.
+
+Zachowany poprzedni kontener ma nazwę `immich-google-sync-before-update-<timestamp>`; nie usuwać go przed zatwierdzeniem nowej wersji. Zmiany w danych podczas działania nowej wersji nie są automatycznie cofane.
