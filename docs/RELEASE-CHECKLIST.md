@@ -1,28 +1,25 @@
-# Release readiness checklist
+# Release verification checklist
 
-This repository contains a public **source snapshot** of the manual-selection service. Do not label it a production-ready release until these checks pass.
+Use this checklist for **future releases**. The current version is shown in the repository's `VERSION` file; successful GitHub Actions checks and publication do not by themselves prove an end-to-end upload on every installation.
 
-- [ ] Confirm the public source matches the actual running deployment (review differences without exporting secrets).
-- [ ] Run a clean Docker Compose build and verify the container starts.
-- [ ] Check Immich album discovery and preview against a supported Immich version.
-- [ ] Check Google OAuth consent and token refresh with a test account.
-- [ ] Upload one explicitly selected disposable photo and verify it appears in Google Photos.
-- [ ] Repeat the upload request and confirm duplicate handling.
-- [ ] Check pause, resume, cancel, CSV history and database backup.
-- [ ] Confirm no token, API key, local state or private photographs are tracked.
-- [ ] Ensure port 8787 is not reachable from the public internet.
-- [ ] Decide on version tag and release notes only after testing.
+- [ ] Review the change scope and verify no secrets or private photos were committed.
+- [ ] Run syntax, safety, Docker build and smoke checks.
+- [ ] Check album discovery and preview against the deployed Immich version.
+- [ ] Check OAuth refresh using a suitable test account when relevant.
+- [ ] For upload-related changes, send one explicitly selected test photo and confirm its presence in the **Google Photos library**.
+- [ ] Verify previously sent items remain protected against duplicates.
+- [ ] Check pause/resume/cancel, CSV history, manual review and SQLite backup if those features changed.
+- [ ] Ensure port 8787 is not publicly accessible.
+- [ ] Publish a versioned GHCR image only after required checks pass.
+- [ ] Deploy on Synology **manually** using `deploy/update-synology.sh vX.Y.Z`; verify service health and retain rollback materials.
 
-## Known technical caveats
+## Current behavior and cautions
 
-- The panel has no authentication, and its API endpoints can trigger transfers.
-- The compose example binds the port on all interfaces. Use a firewall or a trusted VPN/LAN.
-- The worker starts in a background thread; an immediate second request may race the running flag.
-- The queue state is in memory and is lost on restart.
-- There is no upload retry/backoff for Google HTTP 429 or 5xx errors.
-- A crash between a successful remote upload and the local SQLite commit may cause duplicates.
-- Album lookup is not paginated.
-- The `google_album` setting is currently informational and does not place media in a Google album.
-- The Google Photos upload API remains supported with `photoslibrary.appendonly`; uploads and remote album creation must still be tested against current quotas and policies.
+- Uploads are **one-way, manual-first**, and go to the Google Photos library; no automatic Google album assignment.
+- Optional `PANEL_PASSWORD` enables HTTP Basic authentication; default Compose binds port 8787 to loopback.
+- SQLite records `uploading` / `needs_review` protect uncertain transfers from automatic retry; investigate before requeueing.
+- The queue runs in memory; interruptions can leave an item requiring manual verification.
+- The app uses Google Photos `photoslibrary.appendonly` scope and does not read arbitrary Google Photos albums.
+- Publishing a GitHub release **does not automatically update Synology**.
 
-See [Google's official API update](https://developers.google.com/photos/support/updates) and [upload guide](https://developers.google.com/photos/library/guides/upload-media).
+See [installation](INSTALLATION.md), [Google OAuth](GOOGLE-OAUTH.md), and [Synology operation](SYNOLOGY-PL.md).
