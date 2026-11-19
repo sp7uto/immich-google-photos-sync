@@ -1,6 +1,6 @@
 # Immich → Google Photos Sync — Wiki
 
-**[🇵🇱 Polski](Home-PL.md) · [🇬🇧 English](Home.md)**
+**[🇵🇱 Polski](https://github.com/sp7uto/immich-google-photos-sync/wiki/Home-PL) · [🇬🇧 English](https://github.com/sp7uto/immich-google-photos-sync/wiki/Home)**
 
 ![Grafika otwierająca](https://lh3.googleusercontent.com/pw/AP1GczOFyuxkUmxTsORsaXX6z2ky94-m6qMV_rm_fHo96uzQChurOYTJR8zOftdc5SgQ745nWGmuIxAoi5OX2zZPKinELqY59ku1EDk10si_CTlP4Baz5oBY=s1411-n-no)
 
@@ -10,13 +10,13 @@ Niezależna usługa Docker służąca do **ręcznego, jednokierunkowego** transf
 
 ## Dokumentacja
 
-- [Opis projektu / README](../../README.pl.md)
-- [Instalacja](../INSTALLATION.pl.md)
-- [Google OAuth](../GOOGLE-OAUTH.pl.md)
-- [Bezpieczeństwo](../../SECURITY.pl.md)
-- [Synology — eksploatacja](../SYNOLOGY-PL.md)
-- [Historia zmian](../../CHANGELOG.md)
-- [English Wiki](Home.md)
+- [Opis projektu / README](https://github.com/sp7uto/immich-google-photos-sync/blob/main/README.pl.md)
+- [Instalacja](https://github.com/sp7uto/immich-google-photos-sync/blob/main/docs/INSTALLATION.pl.md)
+- [Google OAuth](https://github.com/sp7uto/immich-google-photos-sync/blob/main/docs/GOOGLE-OAUTH.pl.md)
+- [Bezpieczeństwo](https://github.com/sp7uto/immich-google-photos-sync/blob/main/SECURITY.pl.md)
+- [Synology — eksploatacja](https://github.com/sp7uto/immich-google-photos-sync/blob/main/docs/SYNOLOGY-PL.md)
+- [Historia zmian](https://github.com/sp7uto/immich-google-photos-sync/blob/main/CHANGELOG.md)
+- [English Wiki](https://github.com/sp7uto/immich-google-photos-sync/wiki/Home)
 
 ## Jak działa
 
@@ -32,6 +32,6 @@ Niezależna usługa Docker służąca do **ręcznego, jednokierunkowego** transf
 
 Program nie przypisuje zdjęć automatycznie do albumów Google, nie usuwa oryginałów i nie synchronizuje w obie strony. Panel nie ma własnego TLS — stosuj zaufaną sieć, VPN lub zabezpieczone proxy. Tokeny OAuth przechowuj prywatnie. Nie wykonano formalnego audytu bezpieczeństwa.
 
-Pełny szybki start i spis dokumentacji zawiera [README](../../README.pl.md).
+Pełny szybki start i spis dokumentacji zawiera [README](https://github.com/sp7uto/immich-google-photos-sync/blob/main/README.pl.md).
 
 ![Grafika końcowa](https://lh3.googleusercontent.com/pw/AP1GczOdZak7C7uZuOD717B6_A_k-ivTrg4ONLaivtfLTEjXupgvEqJdDBpV3zKVu1pAhKXWiOmYe18GxvhPIVaV_IWwfhYFD24cg4zedowT0QV-uQvlQHhr=s1411-n-no)
