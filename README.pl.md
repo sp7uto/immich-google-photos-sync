@@ -1,4 +1,4 @@
-<p align="center"><img src="https://lh3.googleusercontent.com/pw/AP1GczOFyuxkUmxTsORsaXX6z2ky94-m6qMV_rm_fHo96uzQChurOYTJR8zOftdc5SgQ745nWGmuIxAoi5OX2zZPKinELqY59ku1EDk10si_CTlP4Baz5oBY=s1411-n-no" alt="Immich do Google Photos Sync — grafika otwierająca" width="850"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/sp7uto/immich-google-photos-sync/main/docs/images/immich-header.jpg" alt="Immich do Google Photos Sync — grafika otwierająca" width="850"></p>
 <p align="center"><img src="app/static/icon.svg" width="88" height="88" alt="Logo projektu"></p>
 
 # Immich → Google Photos Sync
@@ -37,7 +37,7 @@ flowchart LR
 | Uruchomienie | Docker Compose, opcjonalny wariant bez roota, wdrażanie na Synology |
 | Prywatność | Dostęp lokalny domyślnie, opcjonalne `PANEL_PASSWORD`, bez publicznego adresu zwrotnego OAuth |
 
-<p align="center"><img src="https://lh3.googleusercontent.com/pw/AP1GczMUBirbcJRiuUbSyVrv8e06zZLMWNNODuSf2ysG_JHYbZ4DDgWliS3VCKEzv0EBgd98vyV5F-RJ_q9x2eXdupkoEKFj1zvh3YgtLTpVDfQ66g0At-d5=s1411-n-no" alt="Wybór fotografii do wysłania — ilustracja środkowa" width="850"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/sp7uto/immich-google-photos-sync/main/docs/images/immich-workflow.jpg" alt="Wybór fotografii do wysłania — ilustracja środkowa" width="850"></p>
 
 ## Szybki start
 
@@ -90,4 +90,4 @@ Przy przerwanym lub niepewnym transferze sprawdź bibliotekę Google Photos prze
 
 Projekt niezależny, niepowiązany oficjalnie z Immich ani Google.
 
-<p align="center"><img src="https://lh3.googleusercontent.com/pw/AP1GczOdZak7C7uZuOD717B6_A_k-ivTrg4ONLaivtfLTEjXupgvEqJdDBpV3zKVu1pAhKXWiOmYe18GxvhPIVaV_IWwfhYFD24cg4zedowT0QV-uQvlQHhr=s1411-n-no" alt="Immich do Google Photos Sync — grafika końcowa" width="850"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/sp7uto/immich-google-photos-sync/main/docs/images/immich-footer.jpg" alt="Immich do Google Photos Sync — grafika końcowa" width="850"></p>

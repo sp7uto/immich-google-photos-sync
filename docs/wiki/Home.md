@@ -2,7 +2,7 @@
 
 **[🇬🇧 English](https://github.com/sp7uto/immich-google-photos-sync/wiki/Home) · [🇵🇱 Polski](https://github.com/sp7uto/immich-google-photos-sync/wiki/Home-PL)**
 
-![Header](https://lh3.googleusercontent.com/pw/AP1GczOFyuxkUmxTsORsaXX6z2ky94-m6qMV_rm_fHo96uzQChurOYTJR8zOftdc5SgQ745nWGmuIxAoi5OX2zZPKinELqY59ku1EDk10si_CTlP4Baz5oBY=s1411-n-no)
+![Header](https://raw.githubusercontent.com/sp7uto/immich-google-photos-sync/main/docs/images/immich-header.jpg)
 
 **Your photos. Your selection. Your approval.**
 
@@ -26,7 +26,7 @@ A self-hosted Docker service for **manual, one-way** transfer of selected Immich
 4. Monitor progress and examine SQLite/CSV history.
 5. Review uncertain uploads against Google Photos before a retry.
 
-![Manual selection](https://lh3.googleusercontent.com/pw/AP1GczMUBirbcJRiuUbSyVrv8e06zZLMWNNODuSf2ysG_JHYbZ4DDgWliS3VCKEzv0EBgd98vyV5F-RJ_q9x2eXdupkoEKFj1zvh3YgtLTpVDfQ66g0At-d5=s1411-n-no)
+![Manual selection](https://raw.githubusercontent.com/sp7uto/immich-google-photos-sync/main/docs/images/immich-workflow.jpg)
 
 ## Important notes
 
@@ -34,4 +34,4 @@ The program does not assign destination albums, delete originals, or sync in bot
 
 See the main [README](https://github.com/sp7uto/immich-google-photos-sync/blob/main/README.md) for the exact quick start and all documentation links.
 
-![Footer](https://lh3.googleusercontent.com/pw/AP1GczOdZak7C7uZuOD717B6_A_k-ivTrg4ONLaivtfLTEjXupgvEqJdDBpV3zKVu1pAhKXWiOmYe18GxvhPIVaV_IWwfhYFD24cg4zedowT0QV-uQvlQHhr=s1411-n-no)
+![Footer](https://raw.githubusercontent.com/sp7uto/immich-google-photos-sync/main/docs/images/immich-footer.jpg)

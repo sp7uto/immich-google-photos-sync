@@ -1,4 +1,4 @@
-<p align="center"><img src="https://lh3.googleusercontent.com/pw/AP1GczOFyuxkUmxTsORsaXX6z2ky94-m6qMV_rm_fHo96uzQChurOYTJR8zOftdc5SgQ745nWGmuIxAoi5OX2zZPKinELqY59ku1EDk10si_CTlP4Baz5oBY=s1411-n-no" alt="Immich to Google Photos Sync — project header" width="850"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/sp7uto/immich-google-photos-sync/main/docs/images/immich-header.jpg" alt="Immich to Google Photos Sync — project header" width="850"></p>
 <p align="center"><img src="app/static/icon.svg" width="88" height="88" alt="Project logo"></p>
 
 # Immich → Google Photos Sync
@@ -37,7 +37,7 @@ flowchart LR
 | Deployment | Docker Compose; optional non-root override; Synology workflow |
 | Privacy | Loopback-only default; optional `PANEL_PASSWORD`; no public OAuth callback |
 
-<p align="center"><img src="https://lh3.googleusercontent.com/pw/AP1GczMUBirbcJRiuUbSyVrv8e06zZLMWNNODuSf2ysG_JHYbZ4DDgWliS3VCKEzv0EBgd98vyV5F-RJ_q9x2eXdupkoEKFj1zvh3YgtLTpVDfQ66g0At-d5=s1411-n-no" alt="Photo selection workflow — middle illustration" width="850"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/sp7uto/immich-google-photos-sync/main/docs/images/immich-workflow.jpg" alt="Photo selection workflow — middle illustration" width="850"></p>
 
 ## Quick start
 
@@ -90,4 +90,4 @@ GitHub Wiki page sources are maintained in [`docs/wiki/`](docs/wiki/). These fil
 
 This independent project is not affiliated with Immich or Google.
 
-<p align="center"><img src="https://lh3.googleusercontent.com/pw/AP1GczOdZak7C7uZuOD717B6_A_k-ivTrg4ONLaivtfLTEjXupgvEqJdDBpV3zKVu1pAhKXWiOmYe18GxvhPIVaV_IWwfhYFD24cg4zedowT0QV-uQvlQHhr=s1411-n-no" alt="Immich to Google Photos Sync — closing illustration" width="850"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/sp7uto/immich-google-photos-sync/main/docs/images/immich-footer.jpg" alt="Immich to Google Photos Sync — closing illustration" width="850"></p>

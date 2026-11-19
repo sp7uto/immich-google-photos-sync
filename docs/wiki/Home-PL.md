@@ -2,7 +2,7 @@
 
 **[🇵🇱 Polski](https://github.com/sp7uto/immich-google-photos-sync/wiki/Home-PL) · [🇬🇧 English](https://github.com/sp7uto/immich-google-photos-sync/wiki/Home)**
 
-![Grafika otwierająca](https://lh3.googleusercontent.com/pw/AP1GczOFyuxkUmxTsORsaXX6z2ky94-m6qMV_rm_fHo96uzQChurOYTJR8zOftdc5SgQ745nWGmuIxAoi5OX2zZPKinELqY59ku1EDk10si_CTlP4Baz5oBY=s1411-n-no)
+![Grafika otwierająca](https://raw.githubusercontent.com/sp7uto/immich-google-photos-sync/main/docs/images/immich-header.jpg)
 
 **Twoje zdjęcia. Twój wybór. Twoja decyzja.**
 
@@ -26,7 +26,7 @@ Niezależna usługa Docker służąca do **ręcznego, jednokierunkowego** transf
 4. Obserwuj postęp i historię SQLite/CSV.
 5. Niepewne transfery sprawdzaj w Google Photos przed ponowieniem.
 
-![Ręczny wybór fotografii](https://lh3.googleusercontent.com/pw/AP1GczMUBirbcJRiuUbSyVrv8e06zZLMWNNODuSf2ysG_JHYbZ4DDgWliS3VCKEzv0EBgd98vyV5F-RJ_q9x2eXdupkoEKFj1zvh3YgtLTpVDfQ66g0At-d5=s1411-n-no)
+![Ręczny wybór fotografii](https://raw.githubusercontent.com/sp7uto/immich-google-photos-sync/main/docs/images/immich-workflow.jpg)
 
 ## Ważne
 
@@ -34,4 +34,4 @@ Program nie przypisuje zdjęć automatycznie do albumów Google, nie usuwa orygi
 
 Pełny szybki start i spis dokumentacji zawiera [README](https://github.com/sp7uto/immich-google-photos-sync/blob/main/README.pl.md).
 
-![Grafika końcowa](https://lh3.googleusercontent.com/pw/AP1GczOdZak7C7uZuOD717B6_A_k-ivTrg4ONLaivtfLTEjXupgvEqJdDBpV3zKVu1pAhKXWiOmYe18GxvhPIVaV_IWwfhYFD24cg4zedowT0QV-uQvlQHhr=s1411-n-no)
+![Grafika końcowa](https://raw.githubusercontent.com/sp7uto/immich-google-photos-sync/main/docs/images/immich-footer.jpg)
