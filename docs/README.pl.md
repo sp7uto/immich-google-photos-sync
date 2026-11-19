@@ -1,29 +1,13 @@
-# Immich → Google Photos Sync — dokumentacja polska
+# Dokumentacja polska / Polish documentation
 
-<img src="../app/static/icon.svg" alt="Immich → Google Photos" width="96" height="96">
+Dokumentacja główna znajduje się w [README po polsku](../README.pl.md).
 
-Aplikacja uruchamiana w Dockerze pozwala wybrać zdjęcia z albumu Immich i przesłać je do biblioteki Google Photos. Nie jest to automatyczna, dwukierunkowa synchronizacja.
+## Instrukcje
 
-## Jak to działa
+- [Instalacja](INSTALLATION.pl.md)
+- [Google OAuth](GOOGLE-OAUTH.pl.md)
+- [Bezpieczeństwo](../SECURITY.pl.md)
+- [Synology — wdrażanie i eksploatacja](SYNOLOGY-PL.md)
+- [Źródło polskiej strony Wiki](wiki/Home-PL.md)
 
-1. Utwórz w Immich album `do publikacji`.
-2. Dodaj do niego fotografie przeznaczone do wysłania.
-3. Otwórz panel aplikacji na porcie `8787` w zaufanej sieci.
-4. Sprawdź miniatury i zaznacz zdjęcia. Przesyłanie trafia do **biblioteki Google Photos**, bez automatycznego przypisywania do albumu.
-5. Potwierdź wysyłkę i obserwuj postęp.
-
-Program przechowuje historię wysyłek w lokalnej bazie SQLite. Umożliwia wstrzymanie i wznowienie kolejki oraz eksport historii do CSV.
-
-## Ograniczenia
-
-- Zdjęcia trafiają do biblioteki Google Photos, nie do konkretnego albumu. Nie jest wymagany identyfikator albumu Google.
-- Token OAuth trzeba uzyskać osobnym skryptem.
-- Panel obsługuje opcjonalne hasło `PANEL_PASSWORD`, lecz nie zapewnia własnego HTTPS — **nie udostępniaj go publicznie**.
-- Nie usuwa zdjęć z Immich.
-- Wyszukiwanie zdjęć obsługuje stronicowanie; wideo jest domyślnie wyłączone, a formaty RAW wymagają dodatkowych testów.
-
-Zobacz [instrukcję instalacji](INSTALLATION.md) oraz [OAuth](GOOGLE-OAUTH.md).
-
-## Aktualizacje Synology
-
-Publikacja nowej wersji w GitHub **nie aktualizuje automatycznie** działającego kontenera. Aktualizacja jest uruchamiana świadomie poleceniem `sudo sh /volume1/docker/immich-google-sync/deploy/update-synology.sh vX.Y.Z`, gdzie `vX.Y.Z` należy zastąpić numerem opublikowanego wydania. Skrypt wykonuje kopię SQLite i zachowuje poprzedni kontener do wycofania aktualizacji.
+[🇵🇱 Polski](../README.pl.md) · [🇬🇧 English](../README.md)
