@@ -25,9 +25,26 @@ def ensure_images() -> None:
             print(f"Already stored: {dest}")
             continue
         req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-        with urllib.request.urlopen(req, timeout=45) as r:
-            data = r.read(10_000_001)
-            ctype = r.headers.get("Content-Type", "")
+        # Public Google Photos previews use a different URL modifier from viewer thumbnails.
+        # Attempt a larger public preview first, then the known Open Graph preview.
+        data = None
+        ctype = ""
+        last_error = None
+        for suffix in ("=w1200-h630-p-k", "=w600-h315-p-k"):
+            candidate = url.split("=")[0] + suffix
+            req = urllib.request.Request(candidate, headers={"User-Agent": "Mozilla/5.0", "Accept": "image/*"})
+            try:
+                with urllib.request.urlopen(req, timeout=45) as r:
+                    data = r.read(10_000_001)
+                    ctype = r.headers.get("Content-Type", "")
+                if data.startswith((b"\\xff\\xd8\\xff", b"\\x89PNG\\r\\n\\x1a\\n", b"RIFF")):
+                    break
+            except Exception as exc:
+                last_error = exc
+                print(f"Preview not available: {suffix}: {exc}")
+                data = None
+        if data is None:
+            raise RuntimeError(f"{name}: Google Photos previews not downloadable: {last_error}")
         if len(data) < 10000 or len(data) > 10_000_000:
             raise RuntimeError(f"{name}: unexpected image size {len(data)}")
         if not (data.startswith(b"\xff\xd8\xff") or data.startswith(b"\x89PNG\r\n\x1a\n") or data.startswith(b"RIFF")):
