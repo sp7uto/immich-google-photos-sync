@@ -1,6 +1,6 @@
 # Immich → Google Photos Sync — Wiki
 
-**[🇬🇧 English](Home.md) · [🇵🇱 Polski](Home-PL.md)**
+**[🇬🇧 English](https://github.com/sp7uto/immich-google-photos-sync/wiki/Home) · [🇵🇱 Polski](https://github.com/sp7uto/immich-google-photos-sync/wiki/Home-PL)**
 
 ![Header](https://lh3.googleusercontent.com/pw/AP1GczOFyuxkUmxTsORsaXX6z2ky94-m6qMV_rm_fHo96uzQChurOYTJR8zOftdc5SgQ745nWGmuIxAoi5OX2zZPKinELqY59ku1EDk10si_CTlP4Baz5oBY=s1411-n-no)
 
@@ -10,13 +10,13 @@ A self-hosted Docker service for **manual, one-way** transfer of selected Immich
 
 ## Guides
 
-- [Project overview / README](../../README.md)
-- [Installation](../INSTALLATION.md)
-- [Google OAuth](../GOOGLE-OAUTH.md)
-- [Security](../../SECURITY.md)
-- [Synology operations](../SYNOLOGY.en.md)
-- [Change history](../../CHANGELOG.md)
-- [Polish Wiki / Wiki po polsku](Home-PL.md)
+- [Project overview / README](https://github.com/sp7uto/immich-google-photos-sync/blob/main/README.md)
+- [Installation](https://github.com/sp7uto/immich-google-photos-sync/blob/main/docs/INSTALLATION.md)
+- [Google OAuth](https://github.com/sp7uto/immich-google-photos-sync/blob/main/docs/GOOGLE-OAUTH.md)
+- [Security](https://github.com/sp7uto/immich-google-photos-sync/blob/main/SECURITY.md)
+- [Synology operations](https://github.com/sp7uto/immich-google-photos-sync/blob/main/docs/SYNOLOGY.en.md)
+- [Change history](https://github.com/sp7uto/immich-google-photos-sync/blob/main/CHANGELOG.md)
+- [Polish Wiki / Wiki po polsku](https://github.com/sp7uto/immich-google-photos-sync/wiki/Home-PL)
 
 ## Workflow
 
@@ -32,6 +32,6 @@ A self-hosted Docker service for **manual, one-way** transfer of selected Immich
 
 The program does not assign destination albums, delete originals, or sync in both directions. The web panel has no built-in TLS; restrict it to trusted networks, VPN or a secure proxy. Keep OAuth credentials private. No formal security audit has been conducted.
 
-See the main [README](../../README.md) for the exact quick start and all documentation links.
+See the main [README](https://github.com/sp7uto/immich-google-photos-sync/blob/main/README.md) for the exact quick start and all documentation links.
 
 ![Footer](https://lh3.googleusercontent.com/pw/AP1GczOdZak7C7uZuOD717B6_A_k-ivTrg4ONLaivtfLTEjXupgvEqJdDBpV3zKVu1pAhKXWiOmYe18GxvhPIVaV_IWwfhYFD24cg4zedowT0QV-uQvlQHhr=s1411-n-no)
