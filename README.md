@@ -9,7 +9,7 @@
 
 <p align="center"><a href="https://github.com/sp7uto/immich-google-photos-sync/releases"><img src="https://img.shields.io/github/v/release/sp7uto/immich-google-photos-sync" alt="Release"></a> <img src="https://img.shields.io/badge/Docker-supported-2496ED?logo=docker" alt="Docker"> <img src="https://img.shields.io/badge/transfer-manual-orange" alt="Manual approval"></p>
 
-**[Installation](docs/INSTALLATION.md) · [OAuth](docs/GOOGLE-OAUTH.md) · [Security](SECURITY.md) · [Wiki EN](https://github.com/sp7uto/immich-google-photos-sync/wiki/Home) · [Wiki PL](https://github.com/sp7uto/immich-google-photos-sync/wiki/Home-PL)**
+**[Installation](docs/INSTALLATION.md) · [OAuth](docs/GOOGLE-OAUTH.md) · [Security](SECURITY.md) · [Wiki EN](docs/wiki/Home.md) · [Wiki PL](docs/wiki/Home-PL.md)**
 
 > Nothing leaves Immich until you select the files and explicitly approve their upload.
 
@@ -82,9 +82,9 @@ If a transfer is interrupted or uncertain, check Google Photos before deciding w
 | [Google OAuth](docs/GOOGLE-OAUTH.md) | [Google OAuth](docs/GOOGLE-OAUTH.pl.md) |
 | [Security](SECURITY.md) | [Bezpieczeństwo](SECURITY.pl.md) |
 | [Synology operations](docs/SYNOLOGY.en.md) | [Synology — instrukcja](docs/SYNOLOGY-PL.md) |
-| [Wiki Home](https://github.com/sp7uto/immich-google-photos-sync/wiki/Home) | [Wiki Home-PL](https://github.com/sp7uto/immich-google-photos-sync/wiki/Home-PL) |
+| [Wiki Home](docs/wiki/Home.md) | [Wiki Home-PL](docs/wiki/Home-PL.md) |
 
-GitHub Wiki page sources are maintained in [`docs/wiki/`](docs/wiki/).
+GitHub Wiki page sources are maintained in [`docs/wiki/`](docs/wiki/). These files are available in the main repository; publication to the separate GitHub Wiki repository is a separate step.
 
 **Release:** v3.1.6 refines the app icon; upload behavior was confirmed on Synology for v3.1.3. Publishing a GitHub release does not, by itself, deploy the Synology container. Follow the deployment instructions for your installation.
 
