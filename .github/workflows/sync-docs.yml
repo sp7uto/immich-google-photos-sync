@@ -1,0 +1,66 @@
+name: Sync bilingual documentation and Wiki
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'README.md'
+      - 'README.pl.md'
+      - 'docs/wiki/**'
+      - 'docs/images/**'
+      - 'scripts/sync_docs.py'
+      - '.github/workflows/sync-docs.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: docs-sync-main
+  cancel-in-progress: false
+
+jobs:
+  documentation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Download approved images and update paths
+        run: python3 scripts/sync_docs.py
+
+      - name: Commit image binaries and updated documentation
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md README.pl.md docs/wiki docs/images
+          if ! git diff --cached --quiet; then
+            git commit -m "docs: keep three illustrations local and synchronize links [skip ci]"
+            git push
+          fi
+
+      - name: Publish bilingual GitHub Wiki pages
+        env:
+          GH_TOKEN: ${{ secrets.WIKI_TOKEN || secrets.GITHUB_TOKEN }}
+        run: |
+          set -eu
+          temp="$(mktemp -d)"
+          trap 'rm -rf "$temp"' EXIT
+          # Wiki is a separate Git repository; it must be enabled and initialized.
+          if ! git clone --depth=1 "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.wiki.git" "$temp/wiki"; then
+            echo "::warning::Wiki unavailable or write credential insufficient. Wiki sources are ready in docs/wiki."
+            exit 0
+          fi
+          cp docs/wiki/Home.md "$temp/wiki/Home.md"
+          cp docs/wiki/Home-PL.md "$temp/wiki/Home-PL.md"
+          git -C "$temp/wiki" config user.name "github-actions[bot]"
+          git -C "$temp/wiki" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C "$temp/wiki" add Home.md Home-PL.md
+          if ! git -C "$temp/wiki" diff --cached --quiet; then
+            git -C "$temp/wiki" commit -m "docs: synchronize English and Polish Wiki"
+            if ! git -C "$temp/wiki" push; then
+              echo "::warning::Wiki push denied; configure WIKI_TOKEN with permission to write the Wiki."
+            fi
+          fi
