@@ -37,7 +37,7 @@ def ensure_images() -> None:
                 with urllib.request.urlopen(req, timeout=45) as r:
                     data = r.read(10_000_001)
                     ctype = r.headers.get("Content-Type", "")
-                if data.startswith((b"\\xff\\xd8\\xff", b"\\x89PNG\\r\\n\\x1a\\n", b"RIFF")):
+                if data.startswith((b"\xff\xd8\xff", b"\x89PNG\r\n\x1a\n", b"RIFF")):
                     break
             except Exception as exc:
                 last_error = exc
