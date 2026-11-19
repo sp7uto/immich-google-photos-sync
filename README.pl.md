@@ -9,7 +9,7 @@
 
 <p align="center"><a href="https://github.com/sp7uto/immich-google-photos-sync/releases"><img src="https://img.shields.io/github/v/release/sp7uto/immich-google-photos-sync" alt="Wydanie"></a> <img src="https://img.shields.io/badge/Docker-supported-2496ED?logo=docker" alt="Docker"> <img src="https://img.shields.io/badge/transfer-ręczny-orange" alt="Zatwierdzanie ręczne"></p>
 
-**[Instalacja](docs/INSTALLATION.pl.md) · [OAuth](docs/GOOGLE-OAUTH.pl.md) · [Bezpieczeństwo](SECURITY.pl.md) · [Wiki PL](https://github.com/sp7uto/immich-google-photos-sync/wiki/Home-PL) · [Wiki EN](https://github.com/sp7uto/immich-google-photos-sync/wiki/Home)**
+**[Instalacja](docs/INSTALLATION.pl.md) · [OAuth](docs/GOOGLE-OAUTH.pl.md) · [Bezpieczeństwo](SECURITY.pl.md) · [Wiki PL](docs/wiki/Home-PL.md) · [Wiki EN](docs/wiki/Home.md)**
 
 > Żadne zdjęcie nie opuści biblioteki Immich bez Twojego wyboru i wyraźnego zatwierdzenia wysyłki.
 
@@ -82,9 +82,9 @@ Przy przerwanym lub niepewnym transferze sprawdź bibliotekę Google Photos prze
 | [Google OAuth](docs/GOOGLE-OAUTH.pl.md) | [Google OAuth](docs/GOOGLE-OAUTH.md) |
 | [Bezpieczeństwo](SECURITY.pl.md) | [Security](SECURITY.md) |
 | [Synology — instrukcja](docs/SYNOLOGY-PL.md) | [Synology operations](docs/SYNOLOGY.en.md) |
-| [Wiki Home-PL](https://github.com/sp7uto/immich-google-photos-sync/wiki/Home-PL) | [Wiki Home](https://github.com/sp7uto/immich-google-photos-sync/wiki/Home) |
+| [Wiki Home-PL](docs/wiki/Home-PL.md) | [Wiki Home](docs/wiki/Home.md) |
 
-Źródła stron Wiki znajdują się w [`docs/wiki/`](docs/wiki/).
+Źródła stron Wiki znajdują się w [`docs/wiki/`](docs/wiki/). Są dostępne w głównym repozytorium; publikacja w osobnym repozytorium GitHub Wiki wymaga oddzielnego kroku.
 
 **Wydanie:** v3.1.6 udoskonala ikonę; poprawność wysyłania potwierdzono na Synology w v3.1.3. Publikacja wydania w GitHub nie aktualizuje samoczynnie kontenera NAS — stosuj procedurę wdrożeniową.
 
